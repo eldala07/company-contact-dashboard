@@ -2,6 +2,7 @@
 
 import { useGetEntities } from "@/app/(dashboard)/handlers/hooks/queries/getEntities";
 import { isDefined } from "@/lib/isDefined/isDefined";
+
 export default function Home() {
   const { data, loading, error } = useGetEntities();
   const entities = (data?.getEntities || []).filter(isDefined);
