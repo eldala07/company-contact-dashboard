@@ -1,5 +1,6 @@
 import { Company } from "@/app/generated/graphql";
+import { EntityUnion } from "@/types/entity-union";
 
-export const isCompany = (entity: any): entity is Company => {
+export const isCompany = (entity: EntityUnion): entity is Company => {
   return entity.__typename === "Company";
 };
