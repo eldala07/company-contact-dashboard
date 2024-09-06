@@ -27,7 +27,7 @@ const resolvers = {
 type MockField<T> = T extends Maybe<infer U> ? () => U | null : () => T;
 
 type MockFunction<T> = () => {
-  [K in keyof T]: T[K] extends Maybe<any>
+  [K in keyof T]: T[K] extends Maybe<infer U>
     ? MockField<T[K]>
     : MockField<NonNullable<T[K]>>;
 };

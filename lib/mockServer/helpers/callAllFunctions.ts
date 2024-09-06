@@ -1,4 +1,4 @@
-export const callAllFunctions = <T extends Record<string, () => any>>(
+export const callAllFunctions = <T extends Record<string, () => unknown>>(
   obj: T,
 ): { [K in keyof T]: ReturnType<T[K]> } => {
   return Object.fromEntries(
