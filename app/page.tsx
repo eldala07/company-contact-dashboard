@@ -7,8 +7,13 @@ import { useCreateEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutati
 import { entityTypes } from "@/lib/constants";
 import { EntityType } from "@/app/generated/graphql";
 import { toast } from "sonner";
-import { DeleteIcon } from "lucide-react";
+import { EditIcon, TrashIcon } from "lucide-react";
 import { useDeleteEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutations/deleteEntity";
+import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
+import { useAtom } from "jotai";
+import { entityIdAtom } from "@/app/(dashboard)/handlers/atoms";
+import { useRouter } from "next/navigation";
+import DrawerEntity from "@/app/(dashboard)/entity/[id]/(components)/drawerEntity/DrawerEntity";
 
 export default function Home() {
   const { data, loading, error } = useGetEntities();
@@ -17,8 +22,8 @@ export default function Home() {
   const [createEntity, { loading: isCreating }] = useCreateEntityMutation();
   const [deleteEntity] = useDeleteEntityMutation();
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error :(</p>;
+  const router = useRouter();
+  const [entityIdInEdit, setEntityIdInEdit] = useAtom(entityIdAtom);
 
   const handleCreateCompany = async () => {
     const { errors } = await createEntity({
@@ -100,6 +105,17 @@ export default function Home() {
     }
   };
 
+  const handleEditEntity = async (id: string) => {
+    setEntityIdInEdit(id);
+  };
+
+  const handleOpenEntity = async (id: string) => {
+    router.push(`/entity/${id}`);
+  };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error</p>;
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
       <h1>Contacts and companies</h1>
@@ -107,7 +123,11 @@ export default function Home() {
         {entities.map((entity) => (
           <li key={entity.id}>
             <div className="flex gap-2">
-              <DeleteIcon onClick={() => handleDeleteEntity(entity.id)} />
+              <TrashIcon onClick={() => handleDeleteEntity(entity.id)} />
+              <EditIcon onClick={() => handleEditEntity(entity.id)} />
+              <OpenInNewWindowIcon
+                onClick={() => handleOpenEntity(entity.id)}
+              />
               <div>
                 {entity.name} -
                 {"email" in entity
@@ -126,6 +146,7 @@ export default function Home() {
           Add contact
         </Button>
       </div>
+      {entityIdInEdit ? <DrawerEntity /> : null}
     </div>
   );
 }

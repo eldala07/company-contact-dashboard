@@ -12,8 +12,11 @@ export default function (entities: EntityUnion[]) {
   return {
     Query: {
       getEntities: () => entities,
-      getEntity: (_: undefined, { id }: { id: string }) =>
-        entities.find((entity) => entity.id === id),
+      getEntity: (_: undefined, { id }: { id: string }) => {
+        const found = entities.find((entity) => entity.id === id);
+        if (!found) return null;
+        return found;
+      },
     },
     Mutation: {
       createEntity: (_: undefined, { input }: { input: CreateEntityInput }) => {
@@ -70,11 +73,16 @@ export default function (entities: EntityUnion[]) {
     },
     Model: {
       __resolveType(
-        obj: EntityUnion | CreateEntityInput | UpdateEntityInput,
+        obj: (EntityUnion | CreateEntityInput | UpdateEntityInput) & {
+          $ref?: { key: string; typeName: string };
+        },
       ): string | null {
         if ((obj as EntityUnion)?.__typename) {
           if ((obj as EntityUnion).__typename === "Contact") return "Contact";
           if ((obj as EntityUnion).__typename === "Company") return "Company";
+        }
+        if (obj.$ref) {
+          return obj.$ref.typeName;
         }
         if ((obj as CreateEntityInput)?.entityType) {
           if ((obj as CreateEntityInput).entityType === "CONTACT")

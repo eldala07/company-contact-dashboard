@@ -2,9 +2,8 @@ import { ApolloLink, HttpLink } from "@apollo/client";
 import {
   SSRMultipartLink,
   ApolloClient,
-  InMemoryCache,
 } from "@apollo/experimental-nextjs-app-support";
-
+import { cache } from "./cache";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 
 if (process.env.NODE_ENV !== "production") {
@@ -19,7 +18,7 @@ export function makeClient() {
   });
 
   return new ApolloClient({
-    cache: new InMemoryCache(),
+    cache,
     link:
       typeof window === "undefined"
         ? ApolloLink.from([
