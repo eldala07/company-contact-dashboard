@@ -4,12 +4,11 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export default function Error({
-  error,
+  // error,
 }: {
   error: Error & { digest?: string };
 }) {
   const router = useRouter();
-  console.error(error);
 
   return (
     <html>
