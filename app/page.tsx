@@ -7,12 +7,15 @@ import { useCreateEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutati
 import { entityTypes } from "@/lib/constants";
 import { EntityType } from "@/app/generated/graphql";
 import { toast } from "sonner";
+import { DeleteIcon } from "lucide-react";
+import { useDeleteEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutations/deleteEntity";
 
 export default function Home() {
   const { data, loading, error } = useGetEntities();
   const entities = (data?.getEntities || []).filter(isDefined);
 
   const [createEntity, { loading: isCreating }] = useCreateEntityMutation();
+  const [deleteEntity] = useDeleteEntityMutation();
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
@@ -62,7 +65,7 @@ export default function Home() {
           id: "random-uuid",
           name: "Contact name",
           email: "contact@test.com",
-          phone: null,
+          phone: "",
         },
       },
     });
@@ -74,16 +77,44 @@ export default function Home() {
     }
   };
 
+  const handleDeleteEntity = async (id: string) => {
+    const { errors } = await deleteEntity({
+      variables: {
+        input: {
+          id,
+        },
+      },
+      // optimisticResponse: {
+      //   __typename: "Mutation",
+      //   deleteEntity: {
+      //     __typename: "Entity",
+      //     id: "random-uuid",
+      //   },
+      // },
+    });
+
+    if (errors?.length) {
+      toast.error("Something went wrong deleting entity");
+    } else {
+      toast.success("Entity deleted");
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center">
       <h1>Contacts and companies</h1>
       <ul>
         {entities.map((entity) => (
           <li key={entity.id}>
-            {entity.name} -
-            {"email" in entity
-              ? `Email: ${entity.email}`
-              : `Industry: ${entity.industry}`}
+            <div className="flex gap-2">
+              <DeleteIcon onClick={() => handleDeleteEntity(entity.id)} />
+              <div>
+                {entity.name} -
+                {"email" in entity
+                  ? `Email: ${entity.email}`
+                  : `Industry: ${entity.industry}`}
+              </div>
+            </div>
           </li>
         ))}
       </ul>

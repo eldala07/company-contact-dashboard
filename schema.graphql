@@ -53,7 +53,7 @@ enum EntityType {
 type Mutation {
   createEntity(input: CreateEntityInput): Entity
   updateEntity(input: UpdateEntityInput): Entity
-  deleteEntity(input: DeleteEntityInput): ID
+  deleteEntity(input: DeleteEntityInput): Entity
 }
 
 type Query {

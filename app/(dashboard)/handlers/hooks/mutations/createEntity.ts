@@ -15,15 +15,6 @@ export const useCreateEntityMutation = () => {
               fragment: gql`
                 fragment NewEntity on Entity {
                   id
-                  name
-                  ... on Contact {
-                    email
-                    phone
-                  }
-                  ... on Company {
-                    industry
-                    contactEmail
-                  }
                 }
               `,
             });

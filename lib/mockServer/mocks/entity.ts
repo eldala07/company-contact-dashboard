@@ -63,7 +63,7 @@ export default function (entities: EntityUnion[]) {
         const index = entities.findIndex((entity) => entity.id === input.id);
         if (index !== -1) {
           const [deletedEntity] = entities.splice(index, 1);
-          return deletedEntity.id;
+          return deletedEntity;
         }
         return null;
       },

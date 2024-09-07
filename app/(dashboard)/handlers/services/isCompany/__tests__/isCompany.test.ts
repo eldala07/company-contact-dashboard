@@ -3,7 +3,7 @@ import { isCompany } from "../isCompany";
 describe("isCompany", () => {
   it("returns true for a company", () => {
     const company = {
-      __typename: "Company",
+      __typename: "Company" as const,
       id: "company-id",
       name: "company-name",
       industry: "company-industry",
@@ -14,7 +14,7 @@ describe("isCompany", () => {
 
   it("returns false for a contact", () => {
     const contact = {
-      __typename: "Contact",
+      __typename: "Contact" as const,
       id: "contact-id",
       name: "contact-name",
       email: "contact-email@test.com",
