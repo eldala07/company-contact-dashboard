@@ -6,7 +6,7 @@ import { EntityUnion } from "@/types/entity-union";
 import { Company, Contact } from "@/app/generated/graphql";
 import { Maybe } from "@graphql-tools/utils";
 import EntityMock from "./mocks/entity";
-import { callAllFunctions } from "@/lib/mockServer/helpers/callAllFunctions";
+import { callAllFunctions } from "@/lib/mockServer/helpers/callAllFunctions/callAllFunctions";
 
 // In-memory storage for our "database"
 const entities: EntityUnion[] = [];
@@ -28,7 +28,7 @@ type MockField<T> = T extends Maybe<infer U> ? () => U | null : () => T;
 
 type MockFunction<T> = () => {
   [K in keyof T]: T[K] extends Maybe<infer U>
-    ? MockField<T[K]>
+    ? MockField<U>
     : MockField<NonNullable<T[K]>>;
 };
 

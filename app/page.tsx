@@ -17,7 +17,7 @@ export default function Home() {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
 
-  const handleCreateEntity = async () => {
+  const handleCreateCompany = async () => {
     const { errors } = await createEntity({
       variables: {
         input: {
@@ -38,9 +38,38 @@ export default function Home() {
     });
 
     if (errors?.length) {
-      toast.error("Something went wrong creating entity");
+      toast.error("Something went wrong adding company");
     } else {
-      toast.success("Entity created");
+      toast.success("Company added");
+    }
+  };
+
+  const handleCreateContact = async () => {
+    const { errors } = await createEntity({
+      variables: {
+        input: {
+          entityType: entityTypes.CONTACT as EntityType,
+          name: "Contact name",
+          email: "contact@test.com",
+          phone: "+32472765263",
+        },
+      },
+      optimisticResponse: {
+        __typename: "Mutation",
+        createEntity: {
+          __typename: "Contact",
+          id: "random-uuid",
+          name: "Contact name",
+          email: "contact@test.com",
+          phone: "+32472765263",
+        },
+      },
+    });
+
+    if (errors?.length) {
+      toast.error("Something went wrong adding contact");
+    } else {
+      toast.success("Contact added");
     }
   };
 
@@ -57,9 +86,14 @@ export default function Home() {
           </li>
         ))}
       </ul>
-      <Button onClick={handleCreateEntity} disabled={isCreating}>
-        Create entity
-      </Button>
+      <div className="flex gap-2 items-center">
+        <Button onClick={handleCreateCompany} disabled={isCreating}>
+          Add company
+        </Button>
+        <Button onClick={handleCreateContact} disabled={isCreating}>
+          Add contact
+        </Button>
+      </div>
     </div>
   );
 }
