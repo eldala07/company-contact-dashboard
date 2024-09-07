@@ -23,8 +23,16 @@ export default function (entities: EntityUnion[]) {
         };
         entities.push(
           input.entityType === "CONTACT"
-            ? ({ ...newEntity, __typename: "Contact" } as Contact)
-            : ({ ...newEntity, __typename: "Company" } as Company),
+            ? ({
+                ...newEntity,
+                phone: newEntity?.phone ?? "",
+                __typename: "Contact",
+              } as Contact)
+            : ({
+                ...newEntity,
+                contactEmail: newEntity?.contactEmail ?? "",
+                __typename: "Company",
+              } as Company),
         );
         return newEntity;
       },
@@ -61,9 +69,25 @@ export default function (entities: EntityUnion[]) {
       },
     },
     Model: {
-      __resolveType(obj: EntityUnion): string | null {
-        if ("email" in obj) return "Contact";
-        if ("industry" in obj) return "Company";
+      __resolveType(
+        obj: EntityUnion | CreateEntityInput | UpdateEntityInput,
+      ): string | null {
+        if ((obj as EntityUnion)?.__typename) {
+          if ((obj as EntityUnion).__typename === "Contact") return "Contact";
+          if ((obj as EntityUnion).__typename === "Company") return "Company";
+        }
+        if ((obj as CreateEntityInput)?.entityType) {
+          if ((obj as CreateEntityInput).entityType === "CONTACT")
+            return "Contact";
+          if ((obj as CreateEntityInput).entityType === "COMPANY")
+            return "Company";
+        }
+        if ((obj as UpdateEntityInput)?.entityType) {
+          if ((obj as UpdateEntityInput).entityType === "CONTACT")
+            return "Contact";
+          if ((obj as UpdateEntityInput).entityType === "COMPANY")
+            return "Company";
+        }
         return null;
       },
     },

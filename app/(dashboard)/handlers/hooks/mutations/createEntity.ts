@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { CREATE_ENTITY } from "@/app/(dashboard)/handlers/graphql/mutations/createEntity";
 
 export const useCreateEntityMutation = () => {
@@ -10,10 +10,24 @@ export const useCreateEntityMutation = () => {
       cache.modify({
         fields: {
           getEntities(existingEntitiesRefs = []) {
-            return [
-              ...existingEntitiesRefs,
-              { __typename: createEntity.__typename, ...createEntity },
-            ];
+            const newRef = cache.writeFragment({
+              data: createEntity,
+              fragment: gql`
+                fragment NewEntity on Entity {
+                  id
+                  name
+                  ... on Contact {
+                    email
+                    phone
+                  }
+                  ... on Company {
+                    industry
+                    contactEmail
+                  }
+                }
+              `,
+            });
+            return [...existingEntitiesRefs, newRef];
           },
         },
       });

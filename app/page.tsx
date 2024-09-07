@@ -24,6 +24,7 @@ export default function Home() {
           entityType: entityTypes.COMPANY as EntityType,
           name: "Company name",
           industry: "Company industry",
+          contactEmail: "company@test.com",
         },
       },
       optimisticResponse: {
@@ -33,6 +34,7 @@ export default function Home() {
           id: "random-uuid",
           name: "Company name",
           industry: "Company industry",
+          contactEmail: "company@test.com",
         },
       },
     });
@@ -51,7 +53,6 @@ export default function Home() {
           entityType: entityTypes.CONTACT as EntityType,
           name: "Contact name",
           email: "contact@test.com",
-          phone: "+32472765263",
         },
       },
       optimisticResponse: {
@@ -61,7 +62,7 @@ export default function Home() {
           id: "random-uuid",
           name: "Contact name",
           email: "contact@test.com",
-          phone: "+32472765263",
+          phone: null,
         },
       },
     });
