@@ -37,6 +37,7 @@ import { IndustryCellEditor } from "@/app/(dashboard)/components/components/Indu
 import { ContactEmailCellRenderer } from "@/app/(dashboard)/components/components/ContactEmailCellRenderer";
 import { ContactEmailCellEditor } from "@/app/(dashboard)/components/components/ContactEmailCellEditor";
 import { Building2Icon, UserRoundIcon } from "lucide-react";
+import { entityTypes } from "@/lib/constants";
 
 export const CompaniesAndContactsGrid = memo(() => {
   const gridRef = useRef(null);
@@ -149,14 +150,16 @@ export const CompaniesAndContactsGrid = memo(() => {
               return true;
             },
             onCellValueChanged: async (params) => {
-              if (params.oldValue === params.newValue) return;
+              if (params.oldValue === params.newValue || !params.data.__typename)
+                return;
 
               const { errors } = await updateEntityName({
                 variables: {
                   input: {
                     id: params.data.id,
                     name: params.newValue,
-                    entityType: params.data.__typename as EntityType,
+                    entityType:
+                        params.data.__typename.toUpperCase() as EntityType,
                   },
                 },
                 optimisticResponse: {
@@ -227,7 +230,8 @@ export const CompaniesAndContactsGrid = memo(() => {
             onCellValueChanged: async (params) => {
               if (
                 params.oldValue === params.newValue ||
-                !isContact(params.data)
+                !isContact(params.data) ||
+                !params.data.__typename
               )
                 return;
 
@@ -236,7 +240,8 @@ export const CompaniesAndContactsGrid = memo(() => {
                   input: {
                     id: params.data.id,
                     email: params.newValue,
-                    entityType: params.data.__typename as EntityType,
+                    entityType:
+                        params.data.__typename.toUpperCase() as EntityType,
                   },
                 },
                 optimisticResponse: {
@@ -301,7 +306,8 @@ export const CompaniesAndContactsGrid = memo(() => {
             onCellValueChanged: async (params) => {
               if (
                 params.oldValue === params.newValue ||
-                !isContact(params.data)
+                !isContact(params.data) ||
+                !params.data.__typename
               )
                 return;
 
@@ -310,7 +316,8 @@ export const CompaniesAndContactsGrid = memo(() => {
                   input: {
                     id: params.data.id,
                     phone: params.newValue,
-                    entityType: params.data.__typename as EntityType,
+                    entityType:
+                        params.data.__typename.toUpperCase() as EntityType,
                   },
                 },
                 optimisticResponse: {
@@ -375,7 +382,8 @@ export const CompaniesAndContactsGrid = memo(() => {
             onCellValueChanged: async (params) => {
               if (
                 params.oldValue === params.newValue ||
-                !isCompany(params.data)
+                !isCompany(params.data) ||
+                !params.data.__typename
               )
                 return;
 
@@ -384,7 +392,8 @@ export const CompaniesAndContactsGrid = memo(() => {
                   input: {
                     id: params.data.id,
                     industry: params.newValue,
-                    entityType: params.data.__typename as EntityType,
+                    entityType:
+                        params.data.__typename.toUpperCase() as EntityType,
                   },
                 },
                 optimisticResponse: {
@@ -449,7 +458,8 @@ export const CompaniesAndContactsGrid = memo(() => {
             onCellValueChanged: async (params) => {
               if (
                 params.oldValue === params.newValue ||
-                !isCompany(params.data)
+                !isCompany(params.data) ||
+                !params.data.__typename
               )
                 return;
 
@@ -458,7 +468,8 @@ export const CompaniesAndContactsGrid = memo(() => {
                   input: {
                     id: params.data.id,
                     contactEmail: params.newValue,
-                    entityType: params.data.__typename as EntityType,
+                    entityType:
+                      params.data.__typename.toUpperCase() as EntityType,
                   },
                 },
                 optimisticResponse: {
@@ -595,11 +606,6 @@ export const CompaniesAndContactsGrid = memo(() => {
       defaultToolPanel: undefined,
     };
   }, []);
-
-  console.log(
-    "File: CompaniesAndContactsGrid.tsx Line 238 listOfEntities: ",
-    listOfEntities,
-  );
 
   return (
     <div className="h-full flex-1 w-full ag-theme-quartz">

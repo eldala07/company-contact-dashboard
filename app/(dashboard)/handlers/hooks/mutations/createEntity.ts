@@ -18,7 +18,6 @@ export const useCreateEntityMutation = () => {
                 }
               `,
             });
-            console.log("File: createEntity.ts Line 21 newRef: ", newRef);
             return [...existingEntitiesRefs, newRef];
           },
         },
