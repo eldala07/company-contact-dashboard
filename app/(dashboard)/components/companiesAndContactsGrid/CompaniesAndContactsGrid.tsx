@@ -1,47 +1,50 @@
 "use client";
 
-import React, { memo, useCallback, useMemo, useRef, useState } from "react";
+import React, { LegacyRef, memo, useCallback, useMemo, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { useGetEntities } from "@/app/(dashboard)/handlers/hooks/queries/getEntities";
 import {
+  CellClassParams,
+  EditableCallback,
+  EditableCallbackParams,
   GetRowIdParams,
   GridOptions,
   ICellRendererParams,
   ProcessCellForExportParams,
   ProcessDataFromClipboardParams,
   RowSelectedEvent,
-  CellClassParams,
-  EditableCallbackParams,
-  EditableCallback,
+  SizeColumnsToFitGridStrategy,
 } from "ag-grid-community";
 import { useUpdateEntityNameMutation } from "@/app/(dashboard)/handlers/hooks/mutations/updateEntityName";
 import { toast } from "sonner";
-import { NameCellRenderer } from "@/app/(dashboard)/components/components/NameCellRenderer";
 import { EntityUnion } from "@/types/entity-union";
 import { Company, Contact, EntityType } from "@/app/generated/graphql";
-import { NameCellEditor } from "@/app/(dashboard)/components/components/NameCellEditor";
-
 import "ag-grid-enterprise";
-import { EmailCellRenderer } from "@/app/(dashboard)/components/components/EmailCellRenderer";
-import { EmailCellEditor } from "@/app/(dashboard)/components/components/EmailCellEditor";
+import { NameCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/NameCellRenderer";
+import { NameCellEditor } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/NameCellEditor";
+import { EmailCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/EmailCellRenderer";
+import { EmailCellEditor } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/EmailCellEditor";
 import { isContact } from "@/app/(dashboard)/handlers/services/isContact/isContact";
 import { useUpdateContactEmailMutation } from "@/app/(dashboard)/handlers/hooks/mutations/updateContactEmail";
 import { useUpdateContactPhoneMutation } from "@/app/(dashboard)/handlers/hooks/mutations/updateContactPhone";
 import { useUpdateCompanyContactEmailMutation } from "@/app/(dashboard)/handlers/hooks/mutations/updateCompanyContactEmail";
 import { useUpdateCompanyIndustryMutation } from "@/app/(dashboard)/handlers/hooks/mutations/updateCompanyIndustry";
-import { PhoneCellRenderer } from "@/app/(dashboard)/components/components/PhoneCellRenderer";
-import { PhoneCellEditor } from "@/app/(dashboard)/components/components/PhoneCellEditor";
+import { PhoneCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/PhoneCellRenderer";
+import { PhoneCellEditor } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/PhoneCellEditor";
 import { isCompany } from "@/app/(dashboard)/handlers/services/isCompany/isCompany";
-import { IndustryCellRenderer } from "@/app/(dashboard)/components/components/IndustryCellRenderer";
-import { IndustryCellEditor } from "@/app/(dashboard)/components/components/IndustryCellEditor";
-import { ContactEmailCellRenderer } from "@/app/(dashboard)/components/components/ContactEmailCellRenderer";
-import { ContactEmailCellEditor } from "@/app/(dashboard)/components/components/ContactEmailCellEditor";
-import { Building2Icon, UserRoundIcon } from "lucide-react";
-import { entityTypes } from "@/lib/constants";
+import { IndustryCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/IndustryCellRenderer";
+import { IndustryCellEditor } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/IndustryCellEditor";
+import { ContactEmailCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/ContactEmailCellRenderer";
+import { ContactEmailCellEditor } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/ContactEmailCellEditor";
+import { HeaderActions } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/HeaderActions";
+import { CategoryCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/CategoryCellRenderer";
+import { AnimatePresence } from "framer-motion";
 
-export const CompaniesAndContactsGrid = memo(() => {
-  const gridRef = useRef(null);
+type Props = {
+  gridRef: LegacyRef<AgGridReact<EntityUnion>> | undefined;
+};
 
+export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
   const [checked, setChecked] = useState<string[] | undefined>([]);
 
   const { data: dataEntities, loading: loadingEntities } = useGetEntities();
@@ -64,10 +67,14 @@ export const CompaniesAndContactsGrid = memo(() => {
     [],
   );
 
+  const autoSizeStrategy = {
+    type: "fitGridWidth",
+  } as SizeColumnsToFitGridStrategy;
+
   const columns: GridOptions<EntityUnion>["columnDefs"] = useMemo(
     () => [
       {
-        headerName: "Identifier",
+        headerName: "Entity",
         headerGroupComponent: () => (
           <div className="overflow-hidden text-ellipsis">Identifier</div>
         ),
@@ -97,24 +104,25 @@ export const CompaniesAndContactsGrid = memo(() => {
             pinned: true,
             lockPosition: "left",
             lockVisible: true,
+            enableRowGroup: true,
             filter: false,
             width: 50,
             minWidth: 50,
             editable: false,
             valueGetter: (params) =>
-              isCompany(params.data) ? "Company" : "Contact",
+              (isCompany(params.data)
+                ? "Company"
+                : "Contact") as EntityUnion["__typename"],
             valueFormatter: (params) =>
-              isCompany(params.data) ? "Company" : "Contact",
+              (isCompany(params.data)
+                ? "Company"
+                : "Contact") as EntityUnion["__typename"],
             cellRenderer: (
               params: ICellRendererParams<EntityUnion, string>,
             ) => (
-              <div className="h-full flex items-center">
-                {isCompany(params.data) ? (
-                  <Building2Icon width={18} />
-                ) : (
-                  <UserRoundIcon width={18} />
-                )}
-              </div>
+              <CategoryCellRenderer
+                value={params.value as EntityUnion["__typename"]}
+              />
             ),
           },
           {
@@ -126,7 +134,8 @@ export const CompaniesAndContactsGrid = memo(() => {
             lockPosition: "left",
             lockVisible: true,
             filter: false,
-            minWidth: 200,
+            width: 300,
+            minWidth: 100,
             comparator: (valueA: string, valueB: string) => {
               const iValueA = (valueA || "").toLowerCase();
               const iValueB = (valueB || "").toLowerCase();
@@ -150,7 +159,10 @@ export const CompaniesAndContactsGrid = memo(() => {
               return true;
             },
             onCellValueChanged: async (params) => {
-              if (params.oldValue === params.newValue || !params.data.__typename)
+              if (
+                params.oldValue === params.newValue ||
+                !params.data.__typename
+              )
                 return;
 
               const { errors } = await updateEntityName({
@@ -159,7 +171,7 @@ export const CompaniesAndContactsGrid = memo(() => {
                     id: params.data.id,
                     name: params.newValue,
                     entityType:
-                        params.data.__typename.toUpperCase() as EntityType,
+                      params.data.__typename.toUpperCase() as EntityType,
                   },
                 },
                 optimisticResponse: {
@@ -180,7 +192,7 @@ export const CompaniesAndContactsGrid = memo(() => {
             },
             cellRenderer: (
               params: ICellRendererParams<EntityUnion, string>,
-            ) => <NameCellRenderer value={params.value} />,
+            ) => <NameCellRenderer value={params.value} id={params.data?.id} />,
             cellEditor: (params: any) => (
               <NameCellEditor
                 value={params.value}
@@ -190,6 +202,12 @@ export const CompaniesAndContactsGrid = memo(() => {
               />
             ),
           },
+        ],
+      },
+      {
+        headerName: "Contact info",
+        headerGroupComponent: () => "Contact info",
+        children: [
           {
             headerName: "Email",
             field: "email",
@@ -241,7 +259,7 @@ export const CompaniesAndContactsGrid = memo(() => {
                     id: params.data.id,
                     email: params.newValue,
                     entityType:
-                        params.data.__typename.toUpperCase() as EntityType,
+                      params.data.__typename.toUpperCase() as EntityType,
                   },
                 },
                 optimisticResponse: {
@@ -275,7 +293,7 @@ export const CompaniesAndContactsGrid = memo(() => {
           {
             headerName: "Phone",
             field: "phone",
-            cellDataType: "number",
+            cellDataType: "text",
             enableCellChangeFlash: true,
             filter: false,
             minWidth: 100,
@@ -317,7 +335,7 @@ export const CompaniesAndContactsGrid = memo(() => {
                     id: params.data.id,
                     phone: params.newValue,
                     entityType:
-                        params.data.__typename.toUpperCase() as EntityType,
+                      params.data.__typename.toUpperCase() as EntityType,
                   },
                 },
                 optimisticResponse: {
@@ -348,6 +366,12 @@ export const CompaniesAndContactsGrid = memo(() => {
               />
             ),
           },
+        ],
+      },
+      {
+        headerName: "Company info",
+        headerGroupComponent: () => "Company info",
+        children: [
           {
             headerName: "Industry",
             field: "industry",
@@ -393,7 +417,7 @@ export const CompaniesAndContactsGrid = memo(() => {
                     id: params.data.id,
                     industry: params.newValue,
                     entityType:
-                        params.data.__typename.toUpperCase() as EntityType,
+                      params.data.__typename.toUpperCase() as EntityType,
                   },
                 },
                 optimisticResponse: {
@@ -565,7 +589,7 @@ export const CompaniesAndContactsGrid = memo(() => {
       enablePivot: false,
       sortable: true,
       unSortIcon: true,
-      suppressMovable: true,
+      suppressMovable: false,
       filter: true,
       initialHide: false,
       getQuickFilterText: () => "",
@@ -587,8 +611,8 @@ export const CompaniesAndContactsGrid = memo(() => {
           toolPanelParams: {
             suppressPivotMode: true,
             suppressValues: true,
-            suppressColumnMove: true,
-            suppressRowGroups: true,
+            suppressColumnMove: false,
+            suppressRowGroups: false,
           },
         },
         // {
@@ -608,7 +632,10 @@ export const CompaniesAndContactsGrid = memo(() => {
   }, []);
 
   return (
-    <div className="h-full flex-1 w-full ag-theme-quartz">
+    <div className="relative h-full flex-1 w-full ag-theme-quartz">
+      <AnimatePresence>
+        {checked && checked.length ? <HeaderActions /> : null}
+      </AnimatePresence>
       <AgGridReact
         ref={gridRef}
         columnDefs={columns}
@@ -634,8 +661,16 @@ export const CompaniesAndContactsGrid = memo(() => {
         getContextMenuItems={getContextMenuItems}
         defaultColDef={defaultColDef}
         sideBar={sideBar}
+        autoSizeStrategy={autoSizeStrategy}
         groupDisplayType="groupRows"
-        groupRowRenderer="agGroupCellRenderer"
+        groupRowRenderer={"agGroupCellRenderer"}
+        groupRowRendererParams={{
+          // @ts-ignore
+          innerRenderer: (innerParams: any) => {
+            return innerParams.node.key;
+          },
+        }}
+        groupDefaultExpanded={-1}
       />
     </div>
   );

@@ -9,18 +9,25 @@ import { EntityType } from "@/app/generated/graphql";
 import { toast } from "sonner";
 import {
   EditIcon,
-  TrashIcon,
   EyeIcon,
   LayoutDashboardIcon,
+  TrashIcon,
 } from "lucide-react";
 import { useDeleteEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutations/deleteEntity";
 import { useAtom } from "jotai";
 import { entityIdAtom } from "@/app/(dashboard)/handlers/atoms";
 import { useRouter } from "next/navigation";
 import { DrawerEntity } from "@/app/entity/[id]/(components)/drawerEntity/DrawerEntity";
-import { CompaniesAndContactsGrid } from "@/app/(dashboard)/components/CompaniesAndContactsGrid";
+import { CompaniesAndContactsGrid } from "@/app/(dashboard)/components/companiesAndContactsGrid/CompaniesAndContactsGrid";
+import { FooterNewLine } from "@/app/(dashboard)/components/footerNewLine/FooterNewLine";
+import { ChangeEvent, useCallback, useRef } from "react";
+import { Input } from "@/components/ui/input";
+import { AgGridReact } from "ag-grid-react";
+import { EntityUnion } from "@/types/entity-union";
 
 export default function Dashboard() {
+  const gridRef = useRef<AgGridReact<EntityUnion>>(null);
+
   const { data, loading, error } = useGetEntities();
   const entities = (data?.getEntities || []).filter(isDefined);
 
@@ -118,6 +125,18 @@ export default function Dashboard() {
     router.push(`/entity/${id}`);
   };
 
+  const onFilterTextBoxChanged = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      if (!gridRef.current) return;
+
+      gridRef.current.api.setGridOption(
+        "quickFilterText",
+        e.target.value.toLowerCase().trim(),
+      );
+    },
+    [gridRef],
+  );
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error</p>;
 
@@ -128,15 +147,23 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold">Contacts and companies</h1>
       </div>
       <div className="flex-1 flex flex-col gap-4 p-8 h-full">
-        <div className="flex gap-2 items-center">
-          <Button onClick={handleCreateCompany} disabled={isCreating}>
-            Add company
-          </Button>
-          <Button onClick={handleCreateContact} disabled={isCreating}>
-            Add contact
-          </Button>
+        <div className="flex justify-between items-center">
+          <div className="flex gap-2 items-center">
+            <Button onClick={handleCreateCompany} disabled={isCreating}>
+              Add company
+            </Button>
+            <Button onClick={handleCreateContact} disabled={isCreating}>
+              Add contact
+            </Button>
+          </div>
+          <Input
+            type={"search"}
+            onChange={onFilterTextBoxChanged}
+            placeholder={"Search"}
+            className="max-w-80"
+          />
         </div>
-        <CompaniesAndContactsGrid />
+        <CompaniesAndContactsGrid gridRef={gridRef} />
         <ul>
           {entities.map((entity) => (
             <li key={entity.id}>
@@ -155,6 +182,7 @@ export default function Dashboard() {
           ))}
         </ul>
       </div>
+      <FooterNewLine />
       {entityIdInEdit ? <DrawerEntity /> : null}
     </div>
   );

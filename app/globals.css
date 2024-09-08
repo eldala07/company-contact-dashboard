@@ -27,6 +27,23 @@ body {
   .ag-center-cols-viewport {
     min-height: 50px !important;
   }
+  .ag-header-cell-comp-wrapper {
+    white-space: normal;
+    -webkit-line-clamp: 3;
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: auto !important;
+  }
+
+  .ag-row-custom-hover-button {
+    @apply hidden;
+  }
+  .ag-row-hover:not(.ag-row-group):has(.ag-row-custom-hover-button)
+    .ag-row-custom-hover-button,
+  .ag-row-hover:not(.ag-row-group):hover .ag-row-custom-hover-button {
+    @apply flex items-center justify-center;
+  }
 }
 
 @layer base {
