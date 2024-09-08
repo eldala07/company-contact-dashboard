@@ -499,8 +499,7 @@ export const CompaniesAndContactsGrid = memo(() => {
 
   const processDataFromClipboard = useCallback(
     (params: ProcessDataFromClipboardParams<EntityUnion>) => {
-      console.log(params);
-      return null;
+      return params.data;
     },
     [],
   );
