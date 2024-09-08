@@ -2,7 +2,40 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ApolloWrapper } from "@/components/providers/apollo-wrapper";
+import { Provider } from "jotai";
 import { Toaster } from "sonner";
+
+import { ModuleRegistry, ClientSideRowModelModule } from "ag-grid-community";
+
+import {
+  LicenseManager,
+  ClipboardModule,
+  MenuModule,
+  RangeSelectionModule,
+  ExcelExportModule,
+  StatusBarModule,
+  ColumnsToolPanelModule,
+  FiltersToolPanelModule,
+  SetFilterModule,
+} from "ag-grid-enterprise";
+
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
+
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  ClipboardModule,
+  MenuModule,
+  RangeSelectionModule,
+  ExcelExportModule,
+  StatusBarModule,
+  ColumnsToolPanelModule,
+  FiltersToolPanelModule,
+  SetFilterModule,
+]);
+LicenseManager.setLicenseKey(
+  process.env.NEXT_PUBLIC_AG_GRID_LICENSE_KEY || "no_license_key",
+);
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,7 +64,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Toaster />
-        <ApolloWrapper>{children}</ApolloWrapper>
+        <Provider>
+          <ApolloWrapper>
+            <div className="flex min-h-screen">
+              {/*<div className="w-48 bg-slate-800 rounded-tr-2xl rounded-br-2xl"></div>*/}
+              <main className="flex-1 overflow-hidden">{children}</main>
+            </div>
+          </ApolloWrapper>
+        </Provider>
       </body>
     </html>
   );

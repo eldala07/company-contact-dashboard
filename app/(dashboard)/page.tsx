@@ -7,15 +7,20 @@ import { useCreateEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutati
 import { entityTypes } from "@/lib/constants";
 import { EntityType } from "@/app/generated/graphql";
 import { toast } from "sonner";
-import { EditIcon, TrashIcon } from "lucide-react";
+import {
+  EditIcon,
+  TrashIcon,
+  EyeIcon,
+  LayoutDashboardIcon,
+} from "lucide-react";
 import { useDeleteEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutations/deleteEntity";
-import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import { useAtom } from "jotai";
 import { entityIdAtom } from "@/app/(dashboard)/handlers/atoms";
 import { useRouter } from "next/navigation";
-import DrawerEntity from "@/app/(dashboard)/entity/[id]/(components)/drawerEntity/DrawerEntity";
+import { DrawerEntity } from "@/app/entity/[id]/(components)/drawerEntity/DrawerEntity";
+import { CompaniesAndContactsGrid } from "@/app/(dashboard)/components/CompaniesAndContactsGrid";
 
-export default function Home() {
+export default function Dashboard() {
   const { data, loading, error } = useGetEntities();
   const entities = (data?.getEntities || []).filter(isDefined);
 
@@ -117,34 +122,38 @@ export default function Home() {
   if (error) return <p>Error</p>;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center">
-      <h1>Contacts and companies</h1>
-      <ul>
-        {entities.map((entity) => (
-          <li key={entity.id}>
-            <div className="flex gap-2">
-              <TrashIcon onClick={() => handleDeleteEntity(entity.id)} />
-              <EditIcon onClick={() => handleEditEntity(entity.id)} />
-              <OpenInNewWindowIcon
-                onClick={() => handleOpenEntity(entity.id)}
-              />
-              <div>
-                {entity.name} -
-                {"email" in entity
-                  ? `Email: ${entity.email}`
-                  : `Industry: ${entity.industry}`}
+    <div className="min-h-screen flex flex-col h-full">
+      <div className="px-8 h-16 flex gap-2 items-center bg-slate-50 border-b border-slate-200 text-slate-800">
+        <LayoutDashboardIcon />
+        <h1 className="text-2xl font-bold">Contacts and companies</h1>
+      </div>
+      <div className="flex-1 flex flex-col gap-4 p-8 h-full">
+        <div className="flex gap-2 items-center">
+          <Button onClick={handleCreateCompany} disabled={isCreating}>
+            Add company
+          </Button>
+          <Button onClick={handleCreateContact} disabled={isCreating}>
+            Add contact
+          </Button>
+        </div>
+        <CompaniesAndContactsGrid />
+        <ul>
+          {entities.map((entity) => (
+            <li key={entity.id}>
+              <div className="flex gap-2">
+                <TrashIcon onClick={() => handleDeleteEntity(entity.id)} />
+                <EditIcon onClick={() => handleEditEntity(entity.id)} />
+                <EyeIcon onClick={() => handleOpenEntity(entity.id)} />
+                <div>
+                  {entity.name} -
+                  {"email" in entity
+                    ? `Email: ${entity.email}`
+                    : `Industry: ${entity.industry}`}
+                </div>
               </div>
-            </div>
-          </li>
-        ))}
-      </ul>
-      <div className="flex gap-2 items-center">
-        <Button onClick={handleCreateCompany} disabled={isCreating}>
-          Add company
-        </Button>
-        <Button onClick={handleCreateContact} disabled={isCreating}>
-          Add contact
-        </Button>
+            </li>
+          ))}
+        </ul>
       </div>
       {entityIdInEdit ? <DrawerEntity /> : null}
     </div>

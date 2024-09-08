@@ -1,4 +1,4 @@
-import { useMutation } from "@apollo/client";
+import { Reference, useMutation } from "@apollo/client";
 import { DELETE_ENTITY } from "@/app/(dashboard)/handlers/graphql/mutations/deleteEntity";
 
 export const useDeleteEntityMutation = () => {
@@ -8,12 +8,23 @@ export const useDeleteEntityMutation = () => {
       if (!deleteEntity) return;
 
       const identification = cache.identify({
-        id: deleteEntity?.id,
+        id: deleteEntity.id,
         __typename: deleteEntity.__typename,
       });
 
-      cache.evict({ id: identification });
-      cache.gc();
+      cache.modify({
+        fields: {
+          getEntities(existingEntities = [], { readField }) {
+            return existingEntities.filter(
+              (entityRef: Reference) =>
+                readField("id", entityRef) !== deleteEntity.id,
+            );
+          },
+        },
+      });
+
+      cache.evict({ id: identification }); // remove obj from cache
+      cache.gc(); // remove orphan references
     },
   });
 

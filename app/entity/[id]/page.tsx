@@ -5,8 +5,8 @@ import { useParams } from "next/navigation";
 import { useGetEntity } from "@/app/(dashboard)/handlers/hooks/queries/getEntity";
 import { isContact } from "@/app/(dashboard)/handlers/services/isContact/isContact";
 import { isCompany } from "@/app/(dashboard)/handlers/services/isCompany/isCompany";
-import ContactDetails from "@/app/(dashboard)/entity/[id]/(components)/contactDetails/ContactDetails";
-import CompanyDetails from "@/app/(dashboard)/entity/[id]/(components)/companyDetails/CompanyDetails";
+import ContactDetails from "@/app/entity/[id]/(components)/contactDetails/ContactDetails";
+import CompanyDetails from "@/app/entity/[id]/(components)/companyDetails/CompanyDetails";
 
 const EntityDetails = () => {
   const { id } = useParams<{ id: string }>();

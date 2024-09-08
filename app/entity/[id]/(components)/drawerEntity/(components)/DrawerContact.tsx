@@ -8,29 +8,29 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { useAtom } from "jotai";
 import { entityIdAtom } from "@/app/(dashboard)/handlers/atoms";
+import { useAtom } from "jotai";
 import { useGetEntity } from "@/app/(dashboard)/handlers/hooks/queries/getEntity";
 
-const DrawerCompany = () => {
+const DrawerContact = () => {
   const [entityIdInEdit, setEntityIdInEdit] = useAtom(entityIdAtom);
 
-  const { data, loading, error } = useGetEntity({
+  const { data, loading } = useGetEntity({
     variables: { id: entityIdInEdit! },
     skip: !entityIdInEdit,
   });
 
-  const company = data?.getEntity;
+  const contact = data?.getEntity;
 
   return (
     <Sheet open={true} onOpenChange={() => setEntityIdInEdit(null)}>
       <SheetContent>
         {loading && <p>Loading...</p>}
-        {!loading && !!company && (
+        {!loading && !!contact && (
           <SheetHeader>
-            <SheetTitle>Editing {company.name}</SheetTitle>
+            <SheetTitle>Editing {contact.name}</SheetTitle>
             <SheetDescription>
-              Update your company details here.
+              Update your contact details here.
             </SheetDescription>
           </SheetHeader>
         )}
@@ -38,4 +38,4 @@ const DrawerCompany = () => {
     </Sheet>
   );
 };
-export default DrawerCompany;
+export default DrawerContact;
