@@ -2,25 +2,27 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ApolloWrapper } from "@/components/providers/apollo-wrapper";
-import { Provider } from "jotai";
+import { Provider as JotaiProvider } from "jotai";
 import { Toaster } from "sonner";
 
-import { ModuleRegistry, ClientSideRowModelModule } from "ag-grid-community";
+import { ClientSideRowModelModule, ModuleRegistry } from "ag-grid-community";
 
 import {
-  LicenseManager,
   ClipboardModule,
+  ColumnsToolPanelModule,
+  ExcelExportModule,
+  FiltersToolPanelModule,
+  LicenseManager,
   MenuModule,
   RangeSelectionModule,
-  ExcelExportModule,
-  StatusBarModule,
-  ColumnsToolPanelModule,
-  FiltersToolPanelModule,
   SetFilterModule,
+  StatusBarModule,
 } from "ag-grid-enterprise";
 
 import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
+// import "ag-grid-community/styles/ag-theme-quartz.css";
+import "./ag-grid-theme-builder.css";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 ModuleRegistry.registerModules([
   ClientSideRowModelModule,
@@ -64,14 +66,18 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Toaster />
-        <Provider>
-          <ApolloWrapper>
-            <div className="flex min-h-screen">
-              {/*<div className="w-48 bg-slate-800 rounded-tr-2xl rounded-br-2xl"></div>*/}
-              <main className="flex-1 overflow-hidden">{children}</main>
-            </div>
-          </ApolloWrapper>
-        </Provider>
+        <TooltipProvider>
+          <JotaiProvider>
+            <ApolloWrapper>
+              <div className="flex min-h-screen bg-zinc-50">
+                {/*<div className="w-48 bg-zinc-800 rounded-tr-2xl rounded-br-2xl"></div>*/}
+                <main className="flex-1 overflow-hidden flex justify-center">
+                  {children}
+                </main>
+              </div>
+            </ApolloWrapper>
+          </JotaiProvider>
+        </TooltipProvider>
       </body>
     </html>
   );

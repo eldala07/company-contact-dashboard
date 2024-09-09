@@ -7,12 +7,7 @@ import { useCreateEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutati
 import { entityTypes } from "@/lib/constants";
 import { EntityType } from "@/app/generated/graphql";
 import { toast } from "sonner";
-import {
-  EditIcon,
-  EyeIcon,
-  LayoutDashboardIcon,
-  TrashIcon,
-} from "lucide-react";
+import { LayoutDashboardIcon, SquareSlashIcon } from "lucide-react";
 import { useDeleteEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutations/deleteEntity";
 import { useAtom } from "jotai";
 import { entityIdAtom } from "@/app/(dashboard)/handlers/atoms";
@@ -24,6 +19,11 @@ import { ChangeEvent, useCallback, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { AgGridReact } from "ag-grid-react";
 import { EntityUnion } from "@/types/entity-union";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function Dashboard() {
   const gridRef = useRef<AgGridReact<EntityUnion>>(null);
@@ -94,37 +94,6 @@ export default function Dashboard() {
     }
   };
 
-  const handleDeleteEntity = async (id: string) => {
-    const { errors } = await deleteEntity({
-      variables: {
-        input: {
-          id,
-        },
-      },
-      // optimisticResponse: {
-      //   __typename: "Mutation",
-      //   deleteEntity: {
-      //     __typename: "Entity",
-      //     id: "random-uuid",
-      //   },
-      // },
-    });
-
-    if (errors?.length) {
-      toast.error("Something went wrong deleting entity");
-    } else {
-      toast.success("Entity deleted");
-    }
-  };
-
-  const handleEditEntity = async (id: string) => {
-    setEntityIdInEdit(id);
-  };
-
-  const handleOpenEntity = async (id: string) => {
-    router.push(`/entity/${id}`);
-  };
-
   const onFilterTextBoxChanged = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       if (!gridRef.current) return;
@@ -141,8 +110,8 @@ export default function Dashboard() {
   if (error) return <p>Error</p>;
 
   return (
-    <div className="min-h-screen flex flex-col h-full">
-      <div className="px-8 h-16 flex gap-2 items-center bg-slate-50 border-b border-slate-200 text-slate-800">
+    <div className="min-h-screen flex flex-col h-full w-full max-w-screen-2xl">
+      <div className="px-8 h-16 flex gap-2 items-center bg-zinc-50 border-b border-zinc-200 text-zinc-800">
         <LayoutDashboardIcon />
         <h1 className="text-2xl font-bold">Contacts and companies</h1>
       </div>
@@ -156,34 +125,44 @@ export default function Dashboard() {
               Add contact
             </Button>
           </div>
-          <Input
-            type={"search"}
-            onChange={onFilterTextBoxChanged}
-            placeholder={"Search"}
-            className="max-w-80"
-          />
+          <div className="flex gap-2 items-center">
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <SquareSlashIcon className="h-6 w-6" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <div>Ctrl + l to create a new line</div>
+              </TooltipContent>
+            </Tooltip>
+            <Input
+              type={"search"}
+              onChange={onFilterTextBoxChanged}
+              placeholder={"Search"}
+              className="max-w-80"
+            />
+          </div>
         </div>
         <CompaniesAndContactsGrid gridRef={gridRef} />
-        <ul>
-          {entities.map((entity) => (
-            <li key={entity.id}>
-              <div className="flex gap-2">
-                <TrashIcon onClick={() => handleDeleteEntity(entity.id)} />
-                <EditIcon onClick={() => handleEditEntity(entity.id)} />
-                <EyeIcon onClick={() => handleOpenEntity(entity.id)} />
-                <div>
-                  {entity.name} -
-                  {"email" in entity
-                    ? `Email: ${entity.email}`
-                    : `Industry: ${entity.industry}`}
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <FooterNewLine />
+        {entityIdInEdit ? <DrawerEntity /> : null}
+        {/*<ul className="text-zinc-950">*/}
+        {/*  {entities.map((entity) => (*/}
+        {/*    <li key={entity.id}>*/}
+        {/*      <div className="flex gap-2">*/}
+        {/*        <TrashIcon onClick={() => handleDeleteEntity(entity.id)} />*/}
+        {/*        <EditIcon onClick={() => handleEditEntity(entity.id)} />*/}
+        {/*        <EyeIcon onClick={() => handleOpenEntity(entity.id)} />*/}
+        {/*        <div>*/}
+        {/*          {entity.name} -*/}
+        {/*          {"email" in entity*/}
+        {/*            ? `Email: ${entity.email}`*/}
+        {/*            : `Industry: ${entity.industry}`}*/}
+        {/*        </div>*/}
+        {/*      </div>*/}
+        {/*    </li>*/}
+        {/*  ))}*/}
+        {/*</ul>*/}
       </div>
-      <FooterNewLine />
-      {entityIdInEdit ? <DrawerEntity /> : null}
     </div>
   );
 }

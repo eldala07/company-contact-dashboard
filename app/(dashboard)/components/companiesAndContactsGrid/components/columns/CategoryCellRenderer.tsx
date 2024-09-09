@@ -7,7 +7,6 @@ type Props = {
   value?: EntityUnion["__typename"] | null;
 };
 export const CategoryCellRenderer = memo(({ value }: Props) => {
-  console.log("File: CategoryCellRenderer.tsx Line 10 value: ", value);
   return (
     <div className="h-full flex items-center">
       {isCompany({ __typename: value } as EntityUnion) ? (

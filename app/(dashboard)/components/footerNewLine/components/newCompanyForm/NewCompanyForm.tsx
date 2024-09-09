@@ -4,7 +4,6 @@ import React, { memo, useEffect, useMemo } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import validator from "validator";
 import { Input } from "@/components/ui/input";
 import { useCreateEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutations/createEntity";
 import { entityTypes } from "@/lib/constants";
@@ -27,25 +26,25 @@ import { CornerDownLeftIcon } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2).max(50),
-  email: z.string().email(),
-  phone: z.string().refine(validator.isMobilePhone).optional(),
+  industry: z.string(),
+  contactEmail: z.string().email().optional(),
 });
 
-export const NewContactForm = memo(() => {
+export const NewCompanyForm = memo(() => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      email: "",
-      phone: undefined,
+      industry: "",
+      contactEmail: undefined,
     },
   });
 
   useEffect(() => {
     form.reset({
       name: "",
-      email: "",
-      phone: undefined,
+      industry: "",
+      contactEmail: undefined,
     });
   }, []);
 
@@ -69,30 +68,30 @@ export const NewContactForm = memo(() => {
   useHotkeys(hotKeys, []);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const newContactResponse = await createEntity({
+    const newCompanyResponse = await createEntity({
       variables: {
         input: {
           ...values,
-          entityType: entityTypes.CONTACT as EntityType,
+          entityType: entityTypes.COMPANY as EntityType,
         },
       },
       optimisticResponse: {
         __typename: "Mutation",
         createEntity: {
-          __typename: "Contact",
+          __typename: "Company",
           id: "new-uuid",
           ...values,
         },
       },
     });
 
-    if (newContactResponse?.errors) {
-      toast.error("An error occurred while creating the contact");
+    if (newCompanyResponse?.errors) {
+      toast.error("An error occurred while creating the company");
       return;
     }
-    const newContactId = newContactResponse?.data?.createEntity?.id;
-    if (newContactId) {
-      toast("Contact added successfully");
+    const newCompanyId = newCompanyResponse?.data?.createEntity?.id;
+    if (newCompanyId) {
+      toast("Company added successfully");
     }
     handleClose();
   }
@@ -118,10 +117,10 @@ export const NewContactForm = memo(() => {
         />
         <FormField
           control={form.control}
-          name={"email"}
+          name={"industry"}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email*</FormLabel>
+              <FormLabel>Industry</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -131,10 +130,10 @@ export const NewContactForm = memo(() => {
         />
         <FormField
           control={form.control}
-          name={"phone"}
+          name={"contactEmail"}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone</FormLabel>
+              <FormLabel>Contact email</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -150,7 +149,7 @@ export const NewContactForm = memo(() => {
             className="flex gap-0.5"
           >
             <CornerDownLeftIcon className="h-4 w-4" />
-            <div>Add contact</div>
+            <div>Add company</div>
           </LoadingButton>
           <Button type={"button"} variant="secondary" onClick={handleClose}>
             Cancel

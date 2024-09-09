@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { LoaderCircleIcon } from "lucide-react";
 
 type Props = {
   type?: "button" | "submit" | "reset";
@@ -7,6 +8,7 @@ type Props = {
   loadingText: string;
   children: React.ReactNode;
   buttonProps?: any;
+  className?: string;
 };
 
 const LoadingButton = ({
@@ -14,10 +16,18 @@ const LoadingButton = ({
   loadingText,
   children,
   buttonProps,
+  className,
 }: Props) => {
   return (
-    <Button type="submit" {...buttonProps}>
-      {isLoading ? loadingText : children}
+    <Button type="submit" className={className} {...buttonProps}>
+      {isLoading ? (
+        <div className="flex gap-0.5 items-center">
+          <LoaderCircleIcon className="h-4 w-4 animate-spin" />
+          <div>{loadingText}</div>
+        </div>
+      ) : (
+        children
+      )}
     </Button>
   );
 };

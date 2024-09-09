@@ -31,18 +31,18 @@ export const NameCellRenderer = memo(({ value, id }: Props) => {
       {value}
       <div className="absolute right-0 top-1/2 -translate-y-1/2 flex ag-row-custom-hover-button">
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
           onClick={() => handleEditEntity(id)}
         >
-          <EditIcon className="h-4 w-4 p-0" />
+          <EditIcon className="h-5 w-5 p-0 text-primary" />
         </Button>
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon"
           onClick={() => handleOpenEntity(id)}
         >
-          <EyeIcon className="h-4 w-4 p-0" />
+          <EyeIcon className="h-5 w-5 p-0 text-primary" />
         </Button>
       </div>
     </div>

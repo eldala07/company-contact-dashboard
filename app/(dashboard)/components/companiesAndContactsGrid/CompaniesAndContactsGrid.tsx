@@ -36,9 +36,10 @@ import { IndustryCellRenderer } from "@/app/(dashboard)/components/companiesAndC
 import { IndustryCellEditor } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/IndustryCellEditor";
 import { ContactEmailCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/ContactEmailCellRenderer";
 import { ContactEmailCellEditor } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/ContactEmailCellEditor";
-import { HeaderActions } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/HeaderActions";
+import { HeaderActions } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/HeaderActions";
 import { CategoryCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/CategoryCellRenderer";
 import { AnimatePresence } from "framer-motion";
+import { DeleteEntitiesModal } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/DeleteEntitiesModal";
 
 type Props = {
   gridRef: LegacyRef<AgGridReact<EntityUnion>> | undefined;
@@ -632,7 +633,8 @@ export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
   }, []);
 
   return (
-    <div className="relative h-full flex-1 w-full ag-theme-quartz">
+    <div className="relative h-full flex-1 w-full ag-grid-theme-builder">
+      <DeleteEntitiesModal checked={checked} setChecked={setChecked} />
       <AnimatePresence>
         {checked && checked.length ? <HeaderActions /> : null}
       </AnimatePresence>

@@ -77,7 +77,6 @@ export default function (entities: EntityUnion[]) {
           $ref?: { key: string; typeName: string };
         },
       ): string | null {
-        console.log("File: entity.ts Line 80 obj: ", obj);
         if ((obj as EntityUnion)?.__typename) {
           if ((obj as EntityUnion).__typename === "Contact") return "Contact";
           if ((obj as EntityUnion).__typename === "Company") return "Company";

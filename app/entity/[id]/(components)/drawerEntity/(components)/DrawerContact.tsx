@@ -1,18 +1,47 @@
 "use client";
 
-import React from "react";
+import React, { memo, useEffect, useMemo } from "react";
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
 import { entityIdAtom } from "@/app/(dashboard)/handlers/atoms";
 import { useAtom } from "jotai";
 import { useGetEntity } from "@/app/(dashboard)/handlers/hooks/queries/getEntity";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import LoadingButton from "@/components/ui/loading-button";
+import { CornerDownLeftIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import validator from "validator";
+import { HotkeyItem, useHotkeys } from "@/lib/hooks/useHotKeys";
+import { entityTypes } from "@/lib/constants";
+import { Contact, EntityType } from "@/app/generated/graphql";
+import { toast } from "sonner";
+import { useUpdateEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutations/updateEntity";
 
-const DrawerContact = () => {
+const formSchema = z.object({
+  name: z.string().min(2).max(50),
+  email: z.string().email(),
+  phone: z.string().refine(validator.isMobilePhone).optional(),
+});
+
+export const DrawerContact = memo(() => {
   const [entityIdInEdit, setEntityIdInEdit] = useAtom(entityIdAtom);
 
   const { data, loading } = useGetEntity({
@@ -20,22 +49,153 @@ const DrawerContact = () => {
     skip: !entityIdInEdit,
   });
 
-  const contact = data?.getEntity;
+  const contact = data?.getEntity as Contact;
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: contact?.name || "",
+      email: contact?.email || "",
+      phone: contact?.phone || undefined,
+    },
+  });
+
+  useEffect(() => {
+    form.reset({
+      name: contact?.name || "",
+      email: contact?.email || "",
+      phone: contact?.phone || undefined,
+    });
+  }, [contact]);
+
+  const [updateEntity] = useUpdateEntityMutation();
+
+  const handleClose = () => {
+    setEntityIdInEdit(null);
+    form.reset();
+    form.clearErrors();
+  };
+
+  const hotKeys: HotkeyItem[] = useMemo(
+    () => [
+      ["Escape", () => handleClose()],
+      ["Enter", () => form.handleSubmit(onSubmit)()],
+    ],
+    [handleClose, onSubmit, form],
+  );
+
+  useHotkeys(hotKeys, []);
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const newContactResponse = await updateEntity({
+      variables: {
+        input: {
+          id: contact?.id,
+          ...values,
+          entityType: entityTypes.CONTACT as EntityType,
+        },
+      },
+      optimisticResponse: {
+        __typename: "Mutation",
+        updateEntity: {
+          __typename: "Contact",
+          id: "new-uuid",
+          ...values,
+        },
+      },
+    });
+
+    if (newContactResponse?.errors) {
+      toast.error("An error occurred while updating the contact");
+      return;
+    }
+
+    toast("Contact updated successfully");
+    handleClose();
+  }
 
   return (
-    <Sheet open={true} onOpenChange={() => setEntityIdInEdit(null)}>
+    <Sheet open={true} onOpenChange={handleClose}>
       <SheetContent>
-        {loading && <p>Loading...</p>}
-        {!loading && !!contact && (
-          <SheetHeader>
-            <SheetTitle>Editing {contact.name}</SheetTitle>
-            <SheetDescription>
-              Update your contact details here.
-            </SheetDescription>
-          </SheetHeader>
-        )}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {loading && <p>Loading...</p>}
+            {!loading && !!contact && (
+              <>
+                <SheetHeader>
+                  <SheetTitle>Editing {contact.name}</SheetTitle>
+                  <SheetDescription>
+                    Update your contact details here.
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="flex flex-col gap-6">
+                  <FormField
+                    control={form.control}
+                    name={"name"}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name*</FormLabel>
+                        <FormControl>
+                          <Input {...field} autoFocus={true} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={"email"}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email*</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={"phone"}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </>
+            )}
+            <SheetFooter>
+              <SheetClose asChild>
+                <Button
+                  type={"button"}
+                  variant="secondary"
+                  onClick={handleClose}
+                >
+                  Cancel
+                </Button>
+              </SheetClose>
+              <SheetClose asChild>
+                <LoadingButton
+                  type={"submit"}
+                  isLoading={form.formState.isSubmitting}
+                  loadingText={"Updating..."}
+                  className="flex gap-0.5"
+                >
+                  <CornerDownLeftIcon className="h-4 w-4" />
+                  <div>Update contact</div>
+                </LoadingButton>
+              </SheetClose>
+            </SheetFooter>
+          </form>
+        </Form>
       </SheetContent>
     </Sheet>
   );
-};
-export default DrawerContact;
+});
