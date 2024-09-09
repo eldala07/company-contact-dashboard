@@ -16,10 +16,10 @@ export const HeaderActions = memo(() => {
 
   return (
     <motion.div
-      className="justify-self-center absolute right-0 top-0 left-0 flex justify-center items-center h-[50px] bg-secondary text-white rounded-tl-[20px] rounded-tr-[20px] z-10 p-2 border border-zinc-700"
-      initial={{ opacity: 0, width: "95%" }}
-      animate={{ opacity: 1, width: "100%" }}
-      exit={{ opacity: 0, width: "95%" }}
+      className="w-full justify-self-center absolute right-0 top-0 left-0 flex justify-center items-center h-[50px] bg-secondary text-white rounded-tl-[20px] rounded-tr-[20px] z-10 p-2 border border-zinc-700"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
     >
       <Button
         variant="link"
