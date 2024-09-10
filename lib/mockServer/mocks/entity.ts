@@ -8,7 +8,10 @@ import {
 } from "@/app/generated/graphql";
 import { faker } from "@faker-js/faker";
 
-export const EntityMock = (entities: EntityUnion[]) => {
+export const EntityMock = (
+  entities: EntityUnion[],
+  saveEntities: (entities: EntityUnion[]) => void,
+) => {
   return {
     Query: {
       getEntities: () => entities,
@@ -20,24 +23,31 @@ export const EntityMock = (entities: EntityUnion[]) => {
     },
     Mutation: {
       createEntity: (_: undefined, { input }: { input: CreateEntityInput }) => {
-        const newEntity = {
+        const baseEntity = {
           id: faker.string.uuid(),
-          ...input,
-          __typename: input.entityType === "CONTACT" ? "Contact" : "Company",
+          name: input.name,
         };
-        entities.push(
-          input.entityType === "CONTACT"
-            ? ({
-                ...newEntity,
-                phone: newEntity?.phone ?? "",
-                __typename: "Contact",
-              } as Contact)
-            : ({
-                ...newEntity,
-                contactEmail: newEntity?.contactEmail ?? "",
-                __typename: "Company",
-              } as Company),
-        );
+
+        let newEntity: EntityUnion;
+
+        if (input.entityType === "CONTACT") {
+          newEntity = {
+            ...baseEntity,
+            __typename: "Contact",
+            email: input.email || "",
+            phone: input.phone || "",
+          };
+        } else {
+          newEntity = {
+            ...baseEntity,
+            __typename: "Company",
+            industry: input.industry || "",
+            contactEmail: input.contactEmail || "",
+          };
+        }
+
+        entities.push(newEntity);
+        saveEntities(entities);
         return newEntity;
       },
       updateEntity: (
@@ -46,28 +56,36 @@ export const EntityMock = (entities: EntityUnion[]) => {
       ) => {
         const index = entities.findIndex((entity) => entity.id === input.id);
         if (index !== -1) {
-          if (input.entityType === "CONTACT") {
-            entities[index] = {
-              ...entities[index],
-              ...input,
-              ...{ __typename: "Contact" },
-            } as Contact;
-          } else {
-            entities[index] = {
-              ...entities[index],
-              ...input,
-              ...{ __typename: "Company" },
-            } as Company;
+          const existingEntity = entities[index];
+
+          if (existingEntity.__typename === "Contact") {
+            const updatedContact: Contact = {
+              ...existingEntity,
+              name: input.name ?? existingEntity.name,
+              email: input.email ?? existingEntity.email,
+              phone: input.phone ?? existingEntity.phone,
+            };
+            entities[index] = updatedContact;
+          } else if (existingEntity.__typename === "Company") {
+            const updatedCompany: Company = {
+              ...existingEntity,
+              name: input.name ?? existingEntity.name,
+              industry: input.industry ?? existingEntity.industry,
+              contactEmail: input.contactEmail ?? existingEntity.contactEmail,
+            };
+            entities[index] = updatedCompany;
           }
+
+          saveEntities(entities);
           return entities[index];
         }
         return null;
       },
       deleteEntity: (_: undefined, { input }: { input: DeleteEntityInput }) => {
         const index = entities.findIndex((entity) => entity.id === input.id);
-
         if (index !== -1) {
           const [deletedEntity] = entities.splice(index, 1);
+          saveEntities(entities);
           return deletedEntity;
         }
         return null;

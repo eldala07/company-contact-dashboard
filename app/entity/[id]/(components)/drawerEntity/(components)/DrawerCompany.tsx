@@ -34,15 +34,17 @@ import { Company, EntityType } from "@/app/generated/graphql";
 import { toast } from "sonner";
 import { useUpdateEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutations/updateEntity";
 import { useGridRefContext } from "@/app/(dashboard)/handlers/context/GridRefContext";
+import validator from "validator";
 
 const formSchema = z.object({
   name: z.string().min(2).max(50),
   industry: z.string().min(2).max(50),
   contactEmail: z
-    .string()
-    .email()
-    .optional()
-    .transform((e) => (e === "" ? undefined : e)),
+      .string()
+      .refine((val) => val === "" || validator.isEmail(val), {
+        message: "Invalid email address",
+      })
+      .optional(),
 });
 
 export const DrawerCompany = memo(() => {
