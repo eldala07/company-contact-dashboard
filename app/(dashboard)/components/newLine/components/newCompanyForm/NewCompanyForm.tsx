@@ -78,14 +78,6 @@ export const NewCompanyForm = memo(() => {
           entityType: entityTypes.COMPANY as EntityType,
         },
       },
-      optimisticResponse: {
-        __typename: "Mutation",
-        createEntity: {
-          __typename: "Company",
-          id: "new-uuid",
-          ...values,
-        },
-      },
     });
 
     if (newCompanyResponse?.errors) {
@@ -94,7 +86,7 @@ export const NewCompanyForm = memo(() => {
     }
     const newCompanyId = newCompanyResponse?.data?.createEntity?.id;
     if (newCompanyId) {
-      toast("Company added successfully");
+      toast.success("Company added successfully");
     }
     handleClose();
   }

@@ -40,11 +40,11 @@ const formSchema = z.object({
   name: z.string().min(2).max(50),
   industry: z.string().min(2).max(50),
   contactEmail: z
-      .string()
-      .refine((val) => val === "" || validator.isEmail(val), {
-        message: "Invalid email address",
-      })
-      .optional(),
+    .string()
+    .refine((val) => val === "" || validator.isEmail(val), {
+      message: "Invalid email address",
+    })
+    .optional(),
 });
 
 export const DrawerCompany = memo(() => {
@@ -91,7 +91,7 @@ export const DrawerCompany = memo(() => {
   useHotkeys(hotKeys, []);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const newCompanyResponse = await updateEntity({
+    const updatedCompanyResponse = await updateEntity({
       variables: {
         input: {
           id: company?.id,
@@ -103,18 +103,18 @@ export const DrawerCompany = memo(() => {
         __typename: "Mutation",
         updateEntity: {
           __typename: "Company",
-          id: "new-uuid",
+          id: company?.id,
           ...values,
         },
       },
     });
 
-    if (newCompanyResponse?.errors) {
+    if (updatedCompanyResponse?.errors) {
       toast.error("An error occurred while updating the company");
       return;
     }
 
-    const { data } = newCompanyResponse;
+    const { data } = updatedCompanyResponse;
     const updatedCompany = data?.updateEntity as Company;
 
     if (!!gridRef) {
@@ -125,7 +125,7 @@ export const DrawerCompany = memo(() => {
       });
     }
 
-    toast("Company updated successfully");
+    toast.success("Company updated successfully");
     handleClose();
   }
 

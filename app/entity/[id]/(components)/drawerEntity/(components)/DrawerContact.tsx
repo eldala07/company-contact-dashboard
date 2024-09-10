@@ -91,7 +91,7 @@ export const DrawerContact = memo(() => {
   useHotkeys(hotKeys, []);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const newContactResponse = await updateEntity({
+    const updatedContactResponse = await updateEntity({
       variables: {
         input: {
           id: contact?.id,
@@ -103,18 +103,18 @@ export const DrawerContact = memo(() => {
         __typename: "Mutation",
         updateEntity: {
           __typename: "Contact",
-          id: "new-uuid",
+          id: contact?.id,
           ...values,
         },
       },
     });
 
-    if (newContactResponse?.errors) {
+    if (updatedContactResponse?.errors) {
       toast.error("An error occurred while updating the contact");
       return;
     }
 
-    const { data } = newContactResponse;
+    const { data } = updatedContactResponse;
     const updatedContact = data?.updateEntity as Contact;
 
     if (!!gridRef) {
@@ -125,7 +125,7 @@ export const DrawerContact = memo(() => {
       });
     }
 
-    toast("Contact updated successfully");
+    toast.success("Contact updated successfully");
     handleClose();
   }
 

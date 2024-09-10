@@ -43,6 +43,7 @@ import { AnimatePresence } from "framer-motion";
 import { DeleteEntitiesModal } from "./components/DeleteEntitiesModal";
 import { useGridRefContext } from "@/app/(dashboard)/handlers/context/GridRefContext";
 import validator from "validator";
+import { LoaderCircleIcon } from "lucide-react";
 
 export const CompaniesAndContactsGrid = memo(() => {
   const gridRef = useGridRefContext();
@@ -54,7 +55,7 @@ export const CompaniesAndContactsGrid = memo(() => {
   const listOfEntities: GridOptions["rowData"] = useMemo(() => {
     if (!loadingEntities) return JSON.parse(JSON.stringify(entities));
     return [];
-  }, [entities, loadingEntities]);
+  }, [entities.length, loadingEntities]);
 
   const [updateEntityName] = useUpdateEntityNameMutation();
   const [updateContactEmail] = useUpdateContactEmailMutation();
@@ -72,8 +73,8 @@ export const CompaniesAndContactsGrid = memo(() => {
     type: "fitGridWidth",
   } as SizeColumnsToFitGridStrategy;
 
-  const columns: GridOptions<EntityUnion>["columnDefs"] = useMemo(
-    () => [
+  const columns: GridOptions<EntityUnion>["columnDefs"] = useMemo(() => {
+    return [
       {
         headerName: "Entity",
         headerGroupComponent: () => (
@@ -350,7 +351,10 @@ export const CompaniesAndContactsGrid = memo(() => {
               )
                 return;
 
-              if (!params.newValue || !validator.isMobilePhone(params.newValue)) {
+              if (
+                !params.newValue ||
+                !validator.isMobilePhone(params.newValue)
+              ) {
                 params.data.phone = params.oldValue;
                 params.node?.setDataValue(params.column, params.oldValue);
                 toast.error("Invalid phone number");
@@ -576,16 +580,8 @@ export const CompaniesAndContactsGrid = memo(() => {
           },
         ],
       },
-    ],
-    [
-      updateCompanyContactEmail,
-      updateCompanyIndustry,
-      updateEntityName,
-      updateContactEmail,
-      updateContactPhone,
-      validator,
-    ],
-  );
+    ];
+  }, []);
 
   const processDataFromClipboard = useCallback(
     (params: ProcessDataFromClipboardParams<EntityUnion>) => {
@@ -621,21 +617,17 @@ export const CompaniesAndContactsGrid = memo(() => {
     return ["copy", "copyWithHeaders", "copyWithGroupHeaders", "export"];
   }, []);
 
-  const onRowSelected = useCallback(
-    (params: RowSelectedEvent<EntityUnion>) => {
-      const selected = params.node.isSelected();
-      setChecked((prev) => {
-        if (selected) {
-          if (params.node.data?.id)
-            return [...(prev || []), params.node.data.id];
-          return prev;
-        } else {
-          return (prev || []).filter((id) => id !== params.node.data?.id);
-        }
-      });
-    },
-    [setChecked],
-  );
+  const onRowSelected = useCallback((params: RowSelectedEvent<EntityUnion>) => {
+    const selected = params.node.isSelected();
+    setChecked((prev) => {
+      if (selected) {
+        if (params.node.data?.id) return [...(prev || []), params.node.data.id];
+        return prev;
+      } else {
+        return (prev || []).filter((id) => id !== params.node.data?.id);
+      }
+    });
+  }, []);
 
   const defaultColDef = useMemo(() => {
     return {
@@ -671,20 +663,36 @@ export const CompaniesAndContactsGrid = memo(() => {
           },
         },
         {
-            id: "filters",
-            labelDefault: "Filters",
-            labelKey: "filters",
-            iconKey: "filter",
-            toolPanel: "agFiltersToolPanel",
-            minWidth: 225,
-            maxWidth: 550,
-            width: 300,
+          id: "filters",
+          labelDefault: "Filters",
+          labelKey: "filters",
+          iconKey: "filter",
+          toolPanel: "agFiltersToolPanel",
+          minWidth: 225,
+          maxWidth: 550,
+          width: 300,
         },
       ],
       position: "right" as const,
       defaultToolPanel: undefined,
     };
   }, []);
+
+  const groupRowRendererParams = useMemo(() => {
+    return {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      innerRenderer: (innerParams: any) => {
+        return innerParams.node.key;
+      },
+    };
+  }, []);
+
+  if (loadingEntities)
+    return (
+      <div className="relative h-full flex-1 w-full">
+        <LoaderCircleIcon className="h-12 w-12 animate-spin" />
+      </div>
+    );
 
   return (
     <div className="relative h-full flex-1 w-full ag-grid-theme-builder">
@@ -720,12 +728,7 @@ export const CompaniesAndContactsGrid = memo(() => {
         autoSizeStrategy={autoSizeStrategy}
         groupDisplayType="groupRows"
         groupRowRenderer={"agGroupCellRenderer"}
-        groupRowRendererParams={{
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          innerRenderer: (innerParams: any) => {
-            return innerParams.node.key;
-          },
-        }}
+        groupRowRendererParams={groupRowRendererParams}
         groupDefaultExpanded={-1}
       />
     </div>

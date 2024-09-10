@@ -18,7 +18,7 @@ export const DrawerEntity = memo(() => {
     skip: !entityIdInEdit,
   });
 
-  if (loading) return null;
+  if (loading || !entityIdInEdit) return null;
   if (error) {
     toast.error("Something went wrong loading the entity");
     return null;

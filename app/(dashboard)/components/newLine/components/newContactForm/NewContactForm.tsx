@@ -78,14 +78,6 @@ export const NewContactForm = memo(() => {
           entityType: entityTypes.CONTACT as EntityType,
         },
       },
-      optimisticResponse: {
-        __typename: "Mutation",
-        createEntity: {
-          __typename: "Contact",
-          id: "new-uuid",
-          ...values,
-        },
-      },
     });
 
     if (newContactResponse?.errors) {
@@ -94,7 +86,7 @@ export const NewContactForm = memo(() => {
     }
     const newContactId = newContactResponse?.data?.createEntity?.id;
     if (newContactId) {
-      toast("Contact added successfully");
+      toast.success("Contact added successfully");
     }
     handleClose();
   }
