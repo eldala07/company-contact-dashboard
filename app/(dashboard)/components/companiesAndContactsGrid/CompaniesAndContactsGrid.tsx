@@ -44,6 +44,7 @@ import { DeleteEntitiesModal } from "./components/DeleteEntitiesModal";
 import { useGridRefContext } from "@/app/(dashboard)/handlers/context/GridRefContext";
 import validator from "validator";
 import { LoaderCircleIcon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const CompaniesAndContactsGrid = memo(() => {
   const gridRef = useGridRefContext();
@@ -689,8 +690,18 @@ export const CompaniesAndContactsGrid = memo(() => {
 
   if (loadingEntities)
     return (
-      <div className="relative h-full flex-1 w-full">
-        <LoaderCircleIcon className="h-12 w-12 animate-spin" />
+      <div className="relative h-full flex-1 w-full flex gap-3">
+        <div className="h-full flex-1 w-full flex flex-col space-y-3">
+          <div className="space-y-3">
+            <Skeleton className="h-[50px] w-full" />
+            <Skeleton className="h-[50px] w-full" />
+          </div>
+          <Skeleton className="flex-1 w-full" />
+          <div className="space-y-1">
+            <Skeleton className="h-[50px] w-full" />
+          </div>
+        </div>
+        <Skeleton className="w-[35px] h-full" />
       </div>
     );
 
