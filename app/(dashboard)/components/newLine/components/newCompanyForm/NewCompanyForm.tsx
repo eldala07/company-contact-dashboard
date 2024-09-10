@@ -103,7 +103,7 @@ export const NewCompanyForm = memo(() => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex gap-6 items-center"
+        className="flex gap-6 items-center flex-wrap"
       >
         <FormField
           control={form.control}
