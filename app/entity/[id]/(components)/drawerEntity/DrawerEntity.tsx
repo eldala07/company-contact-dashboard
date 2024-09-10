@@ -8,6 +8,7 @@ import { DrawerContact } from "@/app/entity/[id]/(components)/drawerEntity/(comp
 import { entityIdAtom } from "@/app/(dashboard)/handlers/atoms";
 import { useAtomValue } from "jotai";
 import { useGetEntity } from "@/app/(dashboard)/handlers/hooks/queries/getEntity";
+import { toast } from "sonner";
 
 export const DrawerEntity = memo(() => {
   const entityIdInEdit = useAtomValue(entityIdAtom);
@@ -17,8 +18,11 @@ export const DrawerEntity = memo(() => {
     skip: !entityIdInEdit,
   });
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error</p>;
+  if (loading) return null;
+  if (error) {
+    toast.error("Something went wrong loading the entity");
+    return null;
+  }
 
   const entity = data?.getEntity;
 
