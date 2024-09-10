@@ -22,7 +22,7 @@ const saveEntities = (entities: EntityUnion[]) => {
   }
 };
 
-let entities: EntityUnion[] = loadEntities();
+const entities: EntityUnion[] = loadEntities();
 
 type MockField<T> = T extends Maybe<infer U> ? () => U | null : () => T;
 

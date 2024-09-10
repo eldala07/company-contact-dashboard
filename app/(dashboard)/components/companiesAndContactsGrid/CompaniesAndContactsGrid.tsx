@@ -721,7 +721,7 @@ export const CompaniesAndContactsGrid = memo(() => {
         groupDisplayType="groupRows"
         groupRowRenderer={"agGroupCellRenderer"}
         groupRowRendererParams={{
-          // @ts-ignore
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           innerRenderer: (innerParams: any) => {
             return innerParams.node.key;
           },
