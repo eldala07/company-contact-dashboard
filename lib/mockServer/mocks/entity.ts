@@ -8,7 +8,7 @@ import {
 } from "@/app/generated/graphql";
 import { faker } from "@faker-js/faker";
 
-export default function (entities: EntityUnion[]) {
+export const EntityMock = (entities: EntityUnion[]) => {
   return {
     Query: {
       getEntities: () => entities,
@@ -23,6 +23,7 @@ export default function (entities: EntityUnion[]) {
         const newEntity = {
           id: faker.string.uuid(),
           ...input,
+          __typename: input.entityType === "CONTACT" ? "Contact" : "Company",
         };
         entities.push(
           input.entityType === "CONTACT"
@@ -48,14 +49,14 @@ export default function (entities: EntityUnion[]) {
           if (input.entityType === "CONTACT") {
             entities[index] = {
               ...entities[index],
-              ...{ __typename: "Contact" },
               ...input,
+              ...{ __typename: "Contact" },
             } as Contact;
           } else {
             entities[index] = {
               ...entities[index],
-              ...{ __typename: "Company" },
               ...input,
+              ...{ __typename: "Company" },
             } as Company;
           }
           return entities[index];
@@ -64,6 +65,7 @@ export default function (entities: EntityUnion[]) {
       },
       deleteEntity: (_: undefined, { input }: { input: DeleteEntityInput }) => {
         const index = entities.findIndex((entity) => entity.id === input.id);
+
         if (index !== -1) {
           const [deletedEntity] = entities.splice(index, 1);
           return deletedEntity;
@@ -100,4 +102,4 @@ export default function (entities: EntityUnion[]) {
       },
     },
   };
-}
+};

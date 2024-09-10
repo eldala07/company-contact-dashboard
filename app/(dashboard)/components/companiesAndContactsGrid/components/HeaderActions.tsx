@@ -32,3 +32,5 @@ export const HeaderActions = memo(() => {
     </motion.div>
   );
 });
+
+HeaderActions.displayName = "HeaderActions";

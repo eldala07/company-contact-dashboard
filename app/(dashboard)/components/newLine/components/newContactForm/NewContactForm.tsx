@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo, useEffect, useMemo } from "react";
+import React, { memo, useEffect } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -20,7 +20,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { entityIsInlineCreationAtom } from "@/app/(dashboard)/handlers/atoms";
+import { entityTypeInInlineCreationAtom } from "@/app/(dashboard)/handlers/atoms";
 import LoadingButton from "@/components/ui/loading-button";
 import { HotkeyItem, useHotkeys } from "@/lib/hooks/useHotKeys";
 import { CornerDownLeftIcon } from "lucide-react";
@@ -28,7 +28,12 @@ import { CornerDownLeftIcon } from "lucide-react";
 const formSchema = z.object({
   name: z.string().min(2).max(50),
   email: z.string().email(),
-  phone: z.string().refine(validator.isMobilePhone).optional(),
+  phone: z
+    .string()
+    .refine((val) => val === "" || validator.isMobilePhone(val), {
+      message: "Invalid phone number",
+    })
+    .optional(),
 });
 
 export const NewContactForm = memo(() => {
@@ -37,7 +42,7 @@ export const NewContactForm = memo(() => {
     defaultValues: {
       name: "",
       email: "",
-      phone: undefined,
+      phone: "",
     },
   });
 
@@ -45,26 +50,23 @@ export const NewContactForm = memo(() => {
     form.reset({
       name: "",
       email: "",
-      phone: undefined,
+      phone: "",
     });
   }, []);
 
-  const setIsInInsertion = useSetAtom(entityIsInlineCreationAtom);
+  const setIsInInsertion = useSetAtom(entityTypeInInlineCreationAtom);
   const [createEntity] = useCreateEntityMutation();
 
   const handleClose = () => {
-    setIsInInsertion(false);
+    setIsInInsertion(null);
     form.reset();
     form.clearErrors();
   };
 
-  const hotKeys: HotkeyItem[] = useMemo(
-    () => [
-      ["Escape", () => handleClose()],
-      ["Enter", () => form.handleSubmit(onSubmit)()],
-    ],
-    [handleClose, onSubmit, form],
-  );
+  const hotKeys: HotkeyItem[] = [
+    ["Escape", () => handleClose()],
+    ["Enter", () => form.handleSubmit(onSubmit)()],
+  ];
 
   useHotkeys(hotKeys, []);
 
@@ -160,3 +162,5 @@ export const NewContactForm = memo(() => {
     </Form>
   );
 });
+
+NewContactForm.displayName = "NewContactForm";

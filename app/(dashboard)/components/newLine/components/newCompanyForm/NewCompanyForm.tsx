@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo, useEffect, useMemo } from "react";
+import React, { memo, useEffect } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -19,15 +19,21 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { entityIsInlineCreationAtom } from "@/app/(dashboard)/handlers/atoms";
+import { entityTypeInInlineCreationAtom } from "@/app/(dashboard)/handlers/atoms";
 import LoadingButton from "@/components/ui/loading-button";
 import { HotkeyItem, useHotkeys } from "@/lib/hooks/useHotKeys";
 import { CornerDownLeftIcon } from "lucide-react";
+import validator from "validator";
 
 const formSchema = z.object({
   name: z.string().min(2).max(50),
-  industry: z.string(),
-  contactEmail: z.string().email().optional(),
+  industry: z.string().min(2).max(50),
+  contactEmail: z
+    .string()
+    .refine((val) => val === "" || validator.isEmail(val), {
+      message: "Invalid email address",
+    })
+    .optional(),
 });
 
 export const NewCompanyForm = memo(() => {
@@ -36,7 +42,7 @@ export const NewCompanyForm = memo(() => {
     defaultValues: {
       name: "",
       industry: "",
-      contactEmail: undefined,
+      contactEmail: "",
     },
   });
 
@@ -44,26 +50,23 @@ export const NewCompanyForm = memo(() => {
     form.reset({
       name: "",
       industry: "",
-      contactEmail: undefined,
+      contactEmail: "",
     });
   }, []);
 
-  const setIsInInsertion = useSetAtom(entityIsInlineCreationAtom);
+  const setIsInInsertion = useSetAtom(entityTypeInInlineCreationAtom);
   const [createEntity] = useCreateEntityMutation();
 
   const handleClose = () => {
-    setIsInInsertion(false);
+    setIsInInsertion(null);
     form.reset();
     form.clearErrors();
   };
 
-  const hotKeys: HotkeyItem[] = useMemo(
-    () => [
-      ["Escape", () => handleClose()],
-      ["Enter", () => form.handleSubmit(onSubmit)()],
-    ],
-    [handleClose, onSubmit, form],
-  );
+  const hotKeys: HotkeyItem[] = [
+    ["Escape", () => handleClose()],
+    ["Enter", () => form.handleSubmit(onSubmit)()],
+  ];
 
   useHotkeys(hotKeys, []);
 
@@ -120,7 +123,7 @@ export const NewCompanyForm = memo(() => {
           name={"industry"}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Industry</FormLabel>
+              <FormLabel>Industry*</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -159,3 +162,5 @@ export const NewCompanyForm = memo(() => {
     </Form>
   );
 });
+
+NewCompanyForm.displayName = "NewCompanyForm";

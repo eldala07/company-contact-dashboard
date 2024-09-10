@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo, useEffect, useMemo } from "react";
+import React, { memo, useEffect } from "react";
 import {
   Sheet,
   SheetClose,
@@ -33,15 +33,21 @@ import { entityTypes } from "@/lib/constants";
 import { Company, EntityType } from "@/app/generated/graphql";
 import { toast } from "sonner";
 import { useUpdateEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutations/updateEntity";
+import { useGridRefContext } from "@/app/(dashboard)/handlers/context/GridRefContext";
 
 const formSchema = z.object({
   name: z.string().min(2).max(50),
-  industry: z.string(),
-  contactEmail: z.string().optional(),
+  industry: z.string().min(2).max(50),
+  contactEmail: z
+    .string()
+    .email()
+    .optional()
+    .transform((e) => (e === "" ? undefined : e)),
 });
 
 export const DrawerCompany = memo(() => {
   const [entityIdInEdit, setEntityIdInEdit] = useAtom(entityIdAtom);
+  const gridRef = useGridRefContext();
 
   const { data, loading } = useGetEntity({
     variables: { id: entityIdInEdit! },
@@ -75,13 +81,10 @@ export const DrawerCompany = memo(() => {
     form.clearErrors();
   };
 
-  const hotKeys: HotkeyItem[] = useMemo(
-    () => [
-      ["Escape", () => handleClose()],
-      ["Enter", () => form.handleSubmit(onSubmit)()],
-    ],
-    [handleClose, onSubmit, form],
-  );
+  const hotKeys: HotkeyItem[] = [
+    ["Escape", () => handleClose()],
+    ["Enter", () => form.handleSubmit(onSubmit)()],
+  ];
 
   useHotkeys(hotKeys, []);
 
@@ -91,7 +94,7 @@ export const DrawerCompany = memo(() => {
         input: {
           id: company?.id,
           ...values,
-          entityType: entityTypes.CONTACT as EntityType,
+          entityType: entityTypes.COMPANY as EntityType,
         },
       },
       optimisticResponse: {
@@ -107,6 +110,17 @@ export const DrawerCompany = memo(() => {
     if (newCompanyResponse?.errors) {
       toast.error("An error occurred while updating the company");
       return;
+    }
+
+    const { data } = newCompanyResponse;
+    const updatedCompany = data?.updateEntity as Company;
+
+    if (!!gridRef) {
+      const rowNodeToChange = gridRef.current?.api?.getRowNode(company?.id);
+      Object.entries(updatedCompany).forEach(([key, value]) => {
+        if (key === "id" || key === "__typename" || !rowNodeToChange) return;
+        rowNodeToChange.setDataValue(key, value);
+      });
     }
 
     toast("Company updated successfully");
@@ -146,7 +160,7 @@ export const DrawerCompany = memo(() => {
                     name={"industry"}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email*</FormLabel>
+                        <FormLabel>Industry*</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -159,7 +173,7 @@ export const DrawerCompany = memo(() => {
                     name={"contactEmail"}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone</FormLabel>
+                        <FormLabel>Contact email</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -198,3 +212,5 @@ export const DrawerCompany = memo(() => {
     </Sheet>
   );
 });
+
+DrawerCompany.displayName = "DrawerCompany";

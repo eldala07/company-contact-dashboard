@@ -7,3 +7,5 @@ type Props = {
 export const EmailCellRenderer = memo(({ value }: Props) => {
   return <div>{value}</div>;
 });
+
+EmailCellRenderer.displayName = "EmailCellRenderer";

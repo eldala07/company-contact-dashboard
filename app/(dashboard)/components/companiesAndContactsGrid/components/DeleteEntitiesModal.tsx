@@ -99,3 +99,5 @@ export const DeleteEntitiesModal = memo(
     );
   },
 );
+
+DeleteEntitiesModal.displayName = "DeleteEntitiesModal";

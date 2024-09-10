@@ -32,4 +32,5 @@ const EntityDetails = () => {
 
   return null;
 };
+
 export default EntityDetails;

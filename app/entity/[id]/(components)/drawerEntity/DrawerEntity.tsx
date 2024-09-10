@@ -30,3 +30,5 @@ export const DrawerEntity = memo(() => {
   }
   return null;
 });
+
+DrawerEntity.displayName = "DrawerEntity";

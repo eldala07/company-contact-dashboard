@@ -12,3 +12,5 @@ export const IndustryCellEditor = memo(
     return <div>{value}</div>;
   },
 );
+
+IndustryCellEditor.displayName = "IndustryCellEditor";

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ButtonHTMLAttributes } from "react";
 import { Button } from "@/components/ui/button";
 import { LoaderCircleIcon } from "lucide-react";
 
@@ -7,7 +7,7 @@ type Props = {
   isLoading: boolean;
   loadingText: string;
   children: React.ReactNode;
-  buttonProps?: any;
+  buttonProps?: ButtonHTMLAttributes<HTMLButtonElement>;
   className?: string;
 };
 

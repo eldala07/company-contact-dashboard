@@ -7,3 +7,5 @@ type Props = {
 export const IndustryCellRenderer = memo(({ value }: Props) => {
   return <div>{value}</div>;
 });
+
+IndustryCellRenderer.displayName = "IndustryCellRenderer";

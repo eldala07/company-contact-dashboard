@@ -7,3 +7,5 @@ type Props = {
 export const PhoneCellRenderer = memo(({ value }: Props) => {
   return <div>{value}</div>;
 });
+
+PhoneCellRenderer.displayName = "PhoneCellRenderer";

@@ -1,11 +1,11 @@
 import { entityIdAtom } from "./entityIdAtom";
 import { isDeletingEntitiesAtom } from "./isDeletingEntitiesAtom";
-import { entityIsInlineCreationAtom } from "./entityIsInlineCreationAtom";
+import { entityTypeInInlineCreationAtom } from "./entityTypeInInlineCreationAtom";
 import { createEntitiesMultiLinesAtom } from "./createEntitiesMultiLinesAtom";
 
 export {
   entityIdAtom,
   isDeletingEntitiesAtom,
-  entityIsInlineCreationAtom,
+  entityTypeInInlineCreationAtom,
   createEntitiesMultiLinesAtom,
 };

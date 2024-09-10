@@ -7,3 +7,5 @@ type Props = {
 export const ContactEmailCellRenderer = memo(({ value }: Props) => {
   return <div>{value}</div>;
 });
+
+ContactEmailCellRenderer.displayName = "ContactEmailCellRenderer";

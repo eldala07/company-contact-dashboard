@@ -12,3 +12,5 @@ export const ContactEmailCellEditor = memo(
     return <div>{value}</div>;
   },
 );
+
+ContactEmailCellEditor.displayName = "ContactEmailCellEditor";

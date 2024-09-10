@@ -56,5 +56,5 @@ export function useHotkeys(
     document.documentElement.addEventListener("keydown", keydownListener);
     return () =>
       document.documentElement.removeEventListener("keydown", keydownListener);
-  }, [hotkeys]);
+  }, [hotkeys, tagsToIgnore, triggerOnContentEditable]);
 }

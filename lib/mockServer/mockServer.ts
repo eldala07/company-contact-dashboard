@@ -5,7 +5,7 @@ import typeDefs from "../../schema.graphql";
 import { EntityUnion } from "@/types/entity-union";
 import { Company, Contact } from "@/app/generated/graphql";
 import { Maybe } from "@graphql-tools/utils";
-import EntityMock from "./mocks/entity";
+import { EntityMock } from "./mocks/entity";
 import { callAllFunctions } from "@/lib/mockServer/helpers/callAllFunctions/callAllFunctions";
 
 // In-memory storage for our "database"
@@ -42,7 +42,10 @@ const mocks: Mocks = {
     id: () => faker.string.uuid(),
     name: () => faker.person.fullName(),
     email: () => faker.internet.email(),
-    phone: () => (faker.datatype.boolean() ? faker.phone.number() : null),
+    phone: () =>
+      faker.datatype.boolean()
+        ? faker.phone.number({ style: "international" })
+        : null,
   }),
   Company: () => ({
     id: () => faker.string.uuid(),

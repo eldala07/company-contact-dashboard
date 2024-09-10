@@ -49,4 +49,4 @@ export const NameCellRenderer = memo(({ value, id }: Props) => {
   );
 });
 
-//Button visible only if row is hovered .ag-row-hover
+NameCellRenderer.displayName = "NameCellRenderer";

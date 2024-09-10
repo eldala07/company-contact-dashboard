@@ -1,6 +1,6 @@
 "use client";
 
-import React, { LegacyRef, memo, useCallback, useMemo, useState } from "react";
+import React, { memo, useCallback, useMemo, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { useGetEntities } from "@/app/(dashboard)/handlers/hooks/queries/getEntities";
 import {
@@ -20,32 +20,30 @@ import { toast } from "sonner";
 import { EntityUnion } from "@/types/entity-union";
 import { Company, Contact, EntityType } from "@/app/generated/graphql";
 import "ag-grid-enterprise";
-import { NameCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/NameCellRenderer";
-import { NameCellEditor } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/NameCellEditor";
-import { EmailCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/EmailCellRenderer";
-import { EmailCellEditor } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/EmailCellEditor";
+import { NameCellRenderer } from "./components/columns/NameCellRenderer";
+import { NameCellEditor } from "./components/columns/NameCellEditor";
+import { EmailCellRenderer } from "./components/columns/EmailCellRenderer";
+import { EmailCellEditor } from "./components/columns/EmailCellEditor";
 import { isContact } from "@/app/(dashboard)/handlers/services/isContact/isContact";
 import { useUpdateContactEmailMutation } from "@/app/(dashboard)/handlers/hooks/mutations/updateContactEmail";
 import { useUpdateContactPhoneMutation } from "@/app/(dashboard)/handlers/hooks/mutations/updateContactPhone";
 import { useUpdateCompanyContactEmailMutation } from "@/app/(dashboard)/handlers/hooks/mutations/updateCompanyContactEmail";
 import { useUpdateCompanyIndustryMutation } from "@/app/(dashboard)/handlers/hooks/mutations/updateCompanyIndustry";
-import { PhoneCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/PhoneCellRenderer";
-import { PhoneCellEditor } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/PhoneCellEditor";
+import { PhoneCellRenderer } from "./components/columns/PhoneCellRenderer";
+import { PhoneCellEditor } from "./components/columns/PhoneCellEditor";
 import { isCompany } from "@/app/(dashboard)/handlers/services/isCompany/isCompany";
-import { IndustryCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/IndustryCellRenderer";
-import { IndustryCellEditor } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/IndustryCellEditor";
-import { ContactEmailCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/ContactEmailCellRenderer";
-import { ContactEmailCellEditor } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/ContactEmailCellEditor";
-import { HeaderActions } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/HeaderActions";
-import { CategoryCellRenderer } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/columns/CategoryCellRenderer";
+import { IndustryCellRenderer } from "./components/columns/IndustryCellRenderer";
+import { IndustryCellEditor } from "./components/columns/IndustryCellEditor";
+import { ContactEmailCellRenderer } from "./components/columns/ContactEmailCellRenderer";
+import { ContactEmailCellEditor } from "./components/columns/ContactEmailCellEditor";
+import { HeaderActions } from "./components/HeaderActions";
+import { CategoryCellRenderer } from "./components/columns/CategoryCellRenderer";
 import { AnimatePresence } from "framer-motion";
-import { DeleteEntitiesModal } from "@/app/(dashboard)/components/companiesAndContactsGrid/components/DeleteEntitiesModal";
+import { DeleteEntitiesModal } from "./components/DeleteEntitiesModal";
+import { useGridRefContext } from "@/app/(dashboard)/handlers/context/GridRefContext";
 
-type Props = {
-  gridRef: LegacyRef<AgGridReact<EntityUnion>> | undefined;
-};
-
-export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
+export const CompaniesAndContactsGrid = memo(() => {
+  const gridRef = useGridRefContext();
   const [checked, setChecked] = useState<string[] | undefined>([]);
 
   const { data: dataEntities, loading: loadingEntities } = useGetEntities();
@@ -54,7 +52,7 @@ export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
   const listOfEntities: GridOptions["rowData"] = useMemo(() => {
     if (!loadingEntities) return JSON.parse(JSON.stringify(entities));
     return [];
-  }, [entities.length, loadingEntities]);
+  }, [entities, loadingEntities]);
 
   const [updateEntityName] = useUpdateEntityNameMutation();
   const [updateContactEmail] = useUpdateContactEmailMutation();
@@ -77,7 +75,7 @@ export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
       {
         headerName: "Entity",
         headerGroupComponent: () => (
-          <div className="overflow-hidden text-ellipsis">Identifier</div>
+          <div className="overflow-hidden text-ellipsis">Entity</div>
         ),
         headerCheckboxSelection: true,
         suppressMovable: true,
@@ -149,7 +147,7 @@ export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
             cellStyle: (params: CellClassParams<EntityUnion>) => {
               if (params.colDef.editable) {
                 return {
-                  backgroundColor: "#007bff1A", // small opacity and beautiful blue: #007bff
+                  backgroundColor: "#007bff1A",
                 };
               }
               return {};
@@ -194,6 +192,7 @@ export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
             cellRenderer: (
               params: ICellRendererParams<EntityUnion, string>,
             ) => <NameCellRenderer value={params.value} id={params.data?.id} />,
+            // @ts-ignore
             cellEditor: (params: any) => (
               <NameCellEditor
                 value={params.value}
@@ -282,6 +281,7 @@ export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
             cellRenderer: (params: ICellRendererParams<Contact, string>) => (
               <EmailCellRenderer value={params.value} />
             ),
+            // @ts-ignore
             cellEditor: (params: any) => (
               <EmailCellEditor
                 value={params.value}
@@ -358,6 +358,7 @@ export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
             cellRenderer: (params: ICellRendererParams<Contact, string>) => (
               <PhoneCellRenderer value={params.value} />
             ),
+            // @ts-ignore
             cellEditor: (params: any) => (
               <PhoneCellEditor
                 value={params.value}
@@ -440,6 +441,7 @@ export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
             cellRenderer: (params: ICellRendererParams<Company, string>) => (
               <IndustryCellRenderer value={params.value} />
             ),
+            // @ts-ignore
             cellEditor: (params: any) => (
               <IndustryCellEditor
                 value={params.value}
@@ -518,6 +520,7 @@ export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
             cellRenderer: (params: ICellRendererParams<Company, string>) => (
               <ContactEmailCellRenderer value={params.value} />
             ),
+            // @ts-ignore
             cellEditor: (params: any) => (
               <ContactEmailCellEditor
                 value={params.value}
@@ -530,7 +533,13 @@ export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
         ],
       },
     ],
-    [],
+    [
+      updateCompanyContactEmail,
+      updateCompanyIndustry,
+      updateEntityName,
+      updateContactEmail,
+      updateContactPhone,
+    ],
   );
 
   const processDataFromClipboard = useCallback(
@@ -565,7 +574,7 @@ export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
 
   const getContextMenuItems = useCallback(() => {
     return ["copy", "copyWithHeaders", "copyWithGroupHeaders", "export"];
-  }, [window]);
+  }, []);
 
   const onRowSelected = useCallback(
     (params: RowSelectedEvent<EntityUnion>) => {
@@ -677,3 +686,5 @@ export const CompaniesAndContactsGrid = memo(({ gridRef }: Props) => {
     </div>
   );
 });
+
+CompaniesAndContactsGrid.displayName = "CompaniesAndContactsGrid";

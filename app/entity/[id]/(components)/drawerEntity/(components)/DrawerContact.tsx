@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo, useEffect, useMemo } from "react";
+import React, { memo, useEffect } from "react";
 import {
   Sheet,
   SheetClose,
@@ -34,15 +34,22 @@ import { entityTypes } from "@/lib/constants";
 import { Contact, EntityType } from "@/app/generated/graphql";
 import { toast } from "sonner";
 import { useUpdateEntityMutation } from "@/app/(dashboard)/handlers/hooks/mutations/updateEntity";
+import { useGridRefContext } from "@/app/(dashboard)/handlers/context/GridRefContext";
 
 const formSchema = z.object({
   name: z.string().min(2).max(50),
   email: z.string().email(),
-  phone: z.string().refine(validator.isMobilePhone).optional(),
+  phone: z
+    .string()
+    .refine((val) => val === "" || validator.isMobilePhone(val), {
+      message: "Invalid phone number",
+    })
+    .optional(),
 });
 
 export const DrawerContact = memo(() => {
   const [entityIdInEdit, setEntityIdInEdit] = useAtom(entityIdAtom);
+  const gridRef = useGridRefContext();
 
   const { data, loading } = useGetEntity({
     variables: { id: entityIdInEdit! },
@@ -56,7 +63,7 @@ export const DrawerContact = memo(() => {
     defaultValues: {
       name: contact?.name || "",
       email: contact?.email || "",
-      phone: contact?.phone || undefined,
+      phone: contact?.phone || "",
     },
   });
 
@@ -64,7 +71,7 @@ export const DrawerContact = memo(() => {
     form.reset({
       name: contact?.name || "",
       email: contact?.email || "",
-      phone: contact?.phone || undefined,
+      phone: contact?.phone || "",
     });
   }, [contact]);
 
@@ -76,13 +83,10 @@ export const DrawerContact = memo(() => {
     form.clearErrors();
   };
 
-  const hotKeys: HotkeyItem[] = useMemo(
-    () => [
-      ["Escape", () => handleClose()],
-      ["Enter", () => form.handleSubmit(onSubmit)()],
-    ],
-    [handleClose, onSubmit, form],
-  );
+  const hotKeys: HotkeyItem[] = [
+    ["Escape", () => handleClose()],
+    ["Enter", () => form.handleSubmit(onSubmit)()],
+  ];
 
   useHotkeys(hotKeys, []);
 
@@ -108,6 +112,17 @@ export const DrawerContact = memo(() => {
     if (newContactResponse?.errors) {
       toast.error("An error occurred while updating the contact");
       return;
+    }
+
+    const { data } = newContactResponse;
+    const updatedContact = data?.updateEntity as Contact;
+
+    if (!!gridRef) {
+      const rowNodeToChange = gridRef.current?.api?.getRowNode(contact?.id);
+      Object.entries(updatedContact).forEach(([key, value]) => {
+        if (key === "id" || key === "__typename" || !rowNodeToChange) return;
+        rowNodeToChange.setDataValue(key, value);
+      });
     }
 
     toast("Contact updated successfully");
@@ -199,3 +214,5 @@ export const DrawerContact = memo(() => {
     </Sheet>
   );
 });
+
+DrawerContact.displayName = "DrawerContact";

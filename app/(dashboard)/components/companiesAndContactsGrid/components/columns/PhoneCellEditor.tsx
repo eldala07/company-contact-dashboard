@@ -12,3 +12,5 @@ export const PhoneCellEditor = memo(
     return <div>{value}</div>;
   },
 );
+
+PhoneCellEditor.displayName = "PhoneCellEditor";
