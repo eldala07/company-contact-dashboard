@@ -1,16 +1,28 @@
-import React, { memo } from "react";
+import React, { memo, useEffect, useRef } from "react";
 import { Contact } from "@/app/generated/graphql";
+import { Input } from "@/components/ui/input";
 
 type Props = {
-  value?: Contact["email"] | null;
+  value?: Contact["email"];
   onValueChange: (value: Contact["email"]) => void;
-  id: Contact["id"];
-  __typename: Contact["__typename"];
 };
-export const EmailCellEditor = memo(
-  ({ value, onValueChange, id, __typename }: Props) => {
-    return <div>{value}</div>;
-  },
-);
+export const EmailCellEditor = memo(({ value, onValueChange }: Props) => {
+  const ref = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.select();
+    }
+  }, []);
+
+  return (
+    <Input
+      ref={ref}
+      value={value}
+      onChange={(e) => onValueChange(e.target.value)}
+      className="w-full h-full p-0 border-none bg-transparent focus-visible:ring-0"
+    />
+  );
+});
 
 EmailCellEditor.displayName = "EmailCellEditor";

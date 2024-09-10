@@ -26,6 +26,10 @@
   .ag-row-hover:not(.ag-row-group):hover .ag-row-custom-hover-button {
     @apply flex items-center justify-center;
   }
+
+  div[data-lastpass-icon-root] {
+    display: none;
+  }
 }
 
 @layer base {

@@ -1,16 +1,27 @@
-import React, { memo } from "react";
-import { Contact } from "@/app/generated/graphql";
+import React, { memo, useEffect, useRef } from "react";
+import { Input } from "@/components/ui/input";
 
 type Props = {
-  value?: Contact["phone"] | null;
-  onValueChange: (value: Contact["phone"]) => void;
-  id: Contact["id"];
-  __typename: Contact["__typename"];
+  value?: string;
+  onValueChange: (value: string) => void;
 };
-export const PhoneCellEditor = memo(
-  ({ value, onValueChange, id, __typename }: Props) => {
-    return <div>{value}</div>;
-  },
-);
+export const PhoneCellEditor = memo(({ value, onValueChange }: Props) => {
+  const ref = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.select();
+    }
+  }, []);
+
+  return (
+    <Input
+      ref={ref}
+      value={value}
+      onChange={(e) => onValueChange(e.target.value)}
+      className="w-full h-full p-0 border-none bg-transparent focus-visible:ring-0"
+    />
+  );
+});
 
 PhoneCellEditor.displayName = "PhoneCellEditor";

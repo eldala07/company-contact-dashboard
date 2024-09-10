@@ -9,6 +9,7 @@ import {
   EditableCallbackParams,
   GetRowIdParams,
   GridOptions,
+  ICellEditorParams,
   ICellRendererParams,
   ProcessCellForExportParams,
   ProcessDataFromClipboardParams,
@@ -41,6 +42,7 @@ import { CategoryCellRenderer } from "./components/columns/CategoryCellRenderer"
 import { AnimatePresence } from "framer-motion";
 import { DeleteEntitiesModal } from "./components/DeleteEntitiesModal";
 import { useGridRefContext } from "@/app/(dashboard)/handlers/context/GridRefContext";
+import validator from "validator";
 
 export const CompaniesAndContactsGrid = memo(() => {
   const gridRef = useGridRefContext();
@@ -164,6 +166,13 @@ export const CompaniesAndContactsGrid = memo(() => {
               )
                 return;
 
+              if (!params.newValue) {
+                params.data.name = params.oldValue;
+                params.node?.setDataValue(params.column, params.oldValue);
+                toast.error("Name cannot be empty");
+                return;
+              }
+
               const { errors } = await updateEntityName({
                 variables: {
                   input: {
@@ -192,13 +201,14 @@ export const CompaniesAndContactsGrid = memo(() => {
             cellRenderer: (
               params: ICellRendererParams<EntityUnion, string>,
             ) => <NameCellRenderer value={params.value} id={params.data?.id} />,
-            // @ts-ignore
-            cellEditor: (params: any) => (
+            cellEditor: (
+              params: ICellEditorParams<EntityUnion, string> & {
+                onValueChange: (newValue?: string) => void;
+              },
+            ) => (
               <NameCellEditor
-                value={params.value}
+                value={params.value === null ? "" : params.value}
                 onValueChange={params.onValueChange}
-                id={params.data.id}
-                __typename={params.data.__typename}
               />
             ),
           },
@@ -253,6 +263,13 @@ export const CompaniesAndContactsGrid = memo(() => {
               )
                 return;
 
+              if (!params.newValue || !validator.isEmail(params.newValue)) {
+                params.data.email = params.oldValue;
+                params.node?.setDataValue(params.column, params.oldValue);
+                toast.error("Invalid email address");
+                return;
+              }
+
               const { errors } = await updateContactEmail({
                 variables: {
                   input: {
@@ -281,13 +298,14 @@ export const CompaniesAndContactsGrid = memo(() => {
             cellRenderer: (params: ICellRendererParams<Contact, string>) => (
               <EmailCellRenderer value={params.value} />
             ),
-            // @ts-ignore
-            cellEditor: (params: any) => (
+            cellEditor: (
+              params: ICellEditorParams<Contact, string> & {
+                onValueChange: (newValue?: string) => void;
+              },
+            ) => (
               <EmailCellEditor
-                value={params.value}
+                value={params.value === null ? "" : params.value}
                 onValueChange={params.onValueChange}
-                id={params.data.id}
-                __typename={params.data.__typename}
               />
             ),
           },
@@ -330,6 +348,13 @@ export const CompaniesAndContactsGrid = memo(() => {
               )
                 return;
 
+              if (!params.newValue || !validator.isMobilePhone(params.newValue)) {
+                params.data.phone = params.oldValue;
+                params.node?.setDataValue(params.column, params.oldValue);
+                toast.error("Invalid phone number");
+                return;
+              }
+
               const { errors } = await updateContactPhone({
                 variables: {
                   input: {
@@ -358,13 +383,14 @@ export const CompaniesAndContactsGrid = memo(() => {
             cellRenderer: (params: ICellRendererParams<Contact, string>) => (
               <PhoneCellRenderer value={params.value} />
             ),
-            // @ts-ignore
-            cellEditor: (params: any) => (
+            cellEditor: (
+              params: ICellEditorParams<Contact, string> & {
+                onValueChange: (newValue?: string) => void;
+              },
+            ) => (
               <PhoneCellEditor
-                value={params.value}
+                value={params.value === null ? "" : params.value}
                 onValueChange={params.onValueChange}
-                id={params.data.id}
-                __typename={params.data.__typename}
               />
             ),
           },
@@ -413,6 +439,13 @@ export const CompaniesAndContactsGrid = memo(() => {
               )
                 return;
 
+              if (!params.newValue) {
+                params.data.industry = params.oldValue;
+                params.node?.setDataValue(params.column, params.oldValue);
+                toast.error("Industry cannot be empty");
+                return;
+              }
+
               const { errors } = await updateCompanyIndustry({
                 variables: {
                   input: {
@@ -441,13 +474,14 @@ export const CompaniesAndContactsGrid = memo(() => {
             cellRenderer: (params: ICellRendererParams<Company, string>) => (
               <IndustryCellRenderer value={params.value} />
             ),
-            // @ts-ignore
-            cellEditor: (params: any) => (
+            cellEditor: (
+              params: ICellEditorParams<Company, string> & {
+                onValueChange: (newValue?: string) => void;
+              },
+            ) => (
               <IndustryCellEditor
-                value={params.value}
+                value={params.value === null ? "" : params.value}
                 onValueChange={params.onValueChange}
-                id={params.data.id}
-                __typename={params.data.__typename}
               />
             ),
           },
@@ -490,6 +524,13 @@ export const CompaniesAndContactsGrid = memo(() => {
               )
                 return;
 
+              if (!params.newValue || !validator.isEmail(params.newValue)) {
+                params.data.contactEmail = params.oldValue;
+                params.node?.setDataValue(params.column, params.oldValue);
+                toast.error("Invalid email address");
+                return;
+              }
+
               const { errors } = await updateCompanyContactEmail({
                 variables: {
                   input: {
@@ -520,13 +561,14 @@ export const CompaniesAndContactsGrid = memo(() => {
             cellRenderer: (params: ICellRendererParams<Company, string>) => (
               <ContactEmailCellRenderer value={params.value} />
             ),
-            // @ts-ignore
-            cellEditor: (params: any) => (
+            cellEditor: (
+              params: ICellEditorParams<Company, string> & {
+                onValueChange: (newValue?: string) => void;
+              },
+            ) => (
               <ContactEmailCellEditor
-                value={params.value}
+                value={params.value === null ? "" : params.value}
                 onValueChange={params.onValueChange}
-                id={params.data.id}
-                __typename={params.data.__typename}
               />
             ),
           },
@@ -539,6 +581,7 @@ export const CompaniesAndContactsGrid = memo(() => {
       updateEntityName,
       updateContactEmail,
       updateContactPhone,
+      validator,
     ],
   );
 
