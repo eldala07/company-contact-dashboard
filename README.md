@@ -2,6 +2,8 @@
 
 A Next.js application that displays a mixed list of companies and contacts. The app leverages modern web technologies including **GraphQL**, **TailwindCSS**, **Headless UI**, **shadcnUI**, **React Hook Form (RHF)**, and **AgGrid** for a smooth and efficient user experience.
 
+![image](https://github.com/user-attachments/assets/647d4ed0-89d0-4611-90d2-24e742aff498)
+
 ## **Table of Contents**
 
 - [Features](#features)
@@ -18,7 +20,6 @@ A Next.js application that displays a mixed list of companies and contacts. The 
 
 - Fetches and displays a mixed list of companies and contacts using **GraphQL**
 - Styled with **TailwindCSS** and **shadcnUI**
-- Uses **Headless UI** components for accessible and customizable UI
 - Form management powered by **React Hook Form (RHF)**
 - Displays data in a dynamic, interactive table using **AgGrid**
 
@@ -29,7 +30,7 @@ A Next.js application that displays a mixed list of companies and contacts. The 
 - **GraphQL** – Data querying and manipulation
 - **TailwindCSS** – Utility-first CSS framework for custom designs
 - **shadcnUI** – Pre-styled component library based on TailwindCSS
-- **Headless UI** – Accessible UI primitives
+- ~~**Headless UI** – Accessible UI primitives~~
 - **React Hook Form** – Form management with hooks
 - **AgGrid** – Advanced data grid for handling complex tables
 
@@ -39,7 +40,7 @@ A Next.js application that displays a mixed list of companies and contacts. The 
 
 Ensure you have the following installed:
 
-- **Node.js** (v16+)
+- **Node.js** (v18.18+)
 - **npm** or **yarn**
 
 ### **Installation**
