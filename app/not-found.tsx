@@ -1,5 +1,5 @@
 import React from "react";
-import NotFound from "@/components/shared/not-found";
+import { NotFound } from "@/components/shared/not-found";
 
 const NotFoundPage = () => {
   return <NotFound />;

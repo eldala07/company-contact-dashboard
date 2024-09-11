@@ -8,7 +8,7 @@ import { isCompany } from "@/app/(dashboard)/handlers/services/isCompany/isCompa
 import { ContactDetails } from "@/app/entity/[id]/(components)/contactDetails/ContactDetails";
 import { CompanyDetails } from "@/app/entity/[id]/(components)/companyDetails/CompanyDetails";
 import { toast } from "sonner";
-import NotFound from "@/components/shared/not-found";
+import { NotFound } from "@/components/shared/not-found";
 
 const EntityDetails = () => {
   const { id } = useParams<{ id: string }>();

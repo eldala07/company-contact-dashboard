@@ -43,7 +43,6 @@ import { AnimatePresence } from "framer-motion";
 import { DeleteEntitiesModal } from "./components/DeleteEntitiesModal";
 import { useGridRefContext } from "@/app/(dashboard)/handlers/context/GridRefContext";
 import validator from "validator";
-import { LoaderCircleIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const CompaniesAndContactsGrid = memo(() => {
@@ -681,8 +680,7 @@ export const CompaniesAndContactsGrid = memo(() => {
 
   const groupRowRendererParams = useMemo(() => {
     return {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      innerRenderer: (innerParams: any) => {
+      innerRenderer: (innerParams: ICellRendererParams) => {
         return innerParams.node.key;
       },
     };
