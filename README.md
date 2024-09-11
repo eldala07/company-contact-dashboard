@@ -2,7 +2,7 @@
 
 A Next.js application that displays a mixed list of companies and contacts. The app leverages modern web technologies including **GraphQL**, **TailwindCSS**, **Headless UI**, **shadcnUI**, **React Hook Form (RHF)**, and **AgGrid** for a smooth and efficient user experience.
 
-![image](https://github.com/user-attachments/assets/647d4ed0-89d0-4611-90d2-24e742aff498)
+![laptop](https://github.com/user-attachments/assets/9c702868-5326-45ae-be56-4462b8f80721)
 
 ## **Table of Contents**
 
@@ -27,10 +27,14 @@ A Next.js application that displays a mixed list of companies and contacts. The 
 - Optimized rerendering for better performance
 - Optimized cache handling or a smoother user experience
 
+
+![iPhone (3)](https://github.com/user-attachments/assets/30c62079-7d43-4907-acb4-07f2508f4bfe)
+![iPhone (4)](https://github.com/user-attachments/assets/53f95873-cd5d-457f-b711-fd1e72782f70)
+
+
 ## **To improve**
 - Supports pagination for handling large datasets
 - Better use of Server-side rendering
-
 
 ## **Technologies Used**
 
