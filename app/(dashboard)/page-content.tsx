@@ -4,7 +4,7 @@ import { LayoutDashboardIcon } from "lucide-react";
 import { CompaniesAndContactsGrid } from "./components/companiesAndContactsGrid/CompaniesAndContactsGrid";
 import { NewLine } from "./components/newLine/NewLine";
 import { GridActions } from "./components/gridActions/GridActions";
-import { DrawerEntity } from "@/app/entity/[id]/(components)/drawerEntity/DrawerEntity";
+import { DrawerEntity } from "./components/drawerEntity/DrawerEntity";
 
 export const PageContent = memo(() => {
   return (
