@@ -1,6 +1,8 @@
 # **Company-Contact Dashboard**
 
-A Next.js application that displays a mixed list of companies and contacts. The app leverages modern web technologies including **GraphQL**, **TailwindCSS**, **Headless UI**, **shadcnUI**, **React Hook Form (RHF)**, and **AgGrid** for a smooth and efficient user experience.
+A Next.js application that displays a mixed list of companies and contacts. 
+
+The app leverages modern web technologies including **GraphQL**, **TailwindCSS**, **Headless UI**, **shadcnUI**, **React Hook Form (RHF)**, and **AgGrid** for a smooth and efficient user experience.
 
 ![laptop](https://github.com/user-attachments/assets/9c702868-5326-45ae-be56-4462b8f80721)
 
@@ -18,23 +20,24 @@ A Next.js application that displays a mixed list of companies and contacts. The 
 
 ## **Features**
 
-- Fetches and displays a mixed list of companies and contacts
-- Allows users to create, update, and delete entities (companies and contacts)
-- Provides a search bar for filtering entities by name
-- Filter and group entities by category (companies or contacts)
-- Displays entity details when clicked on
-- Implements a responsive design for optimal user experience on different devices
-- Optimized rerendering for better performance
-- Optimized cache handling or a smoother user experience
+- Fetches and displays a **mixed list** of companies and contacts
+- Allows users to **create**, **update**, and **delete** entities (companies and contacts)
+- Use of **local storage** to persist data
+- Provides a **search** bar for filtering entities by name
+- **Filter** and **group** entities by category (companies or contacts)
+- Displays **entity details** when clicked on
+- Implements a **responsive design** for optimal user experience on different devices
+- **Optimized rerendering** for better performance
+- **Optimized cache** handling or a smoother user experience
 
-
-![iPhone (3)](https://github.com/user-attachments/assets/30c62079-7d43-4907-acb4-07f2508f4bfe)
-![iPhone (4)](https://github.com/user-attachments/assets/53f95873-cd5d-457f-b711-fd1e72782f70)
-
+![Group 1597880426](https://github.com/user-attachments/assets/450df11d-897c-46f8-9ab6-e5866cdc9e7e)
 
 ## **To improve**
+
 - Supports pagination for handling large datasets
 - Better use of Server-side rendering
+- UI issue with icons on Opera
+- Add an empty view for the Grid
 
 ## **Technologies Used**
 
@@ -54,7 +57,7 @@ A Next.js application that displays a mixed list of companies and contacts. The 
 Ensure you have the following installed:
 
 - **Node.js** (v18.18+)
-- **npm** or **yarn**
+- **npm**
 
 ### **Installation**
 
@@ -72,28 +75,16 @@ Ensure you have the following installed:
 
 3. Install the dependencies:
 
-   Using npm:
    ```bash
     npm install
-   ```
-
-   Using yarn:
-   ```bash
-    yarn install
    ```
 
 ### **Running the App**
 
 1. Start the development server:
 
-   Using npm:
    ```bash
     npm run dev
-   ```
-
-   Using yarn:
-   ```bash
-    yarn dev
    ```
 
 2. Open your browser and navigate to `http://localhost:3000` to view the app.
