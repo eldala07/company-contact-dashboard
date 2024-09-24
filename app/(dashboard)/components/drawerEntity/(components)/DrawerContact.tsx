@@ -186,7 +186,7 @@ export const DrawerContact = memo(() => {
                 </div>
               </>
             )}
-            <SheetFooter>
+            <SheetFooter className="flex gap-3">
               <SheetClose asChild>
                 <Button
                   type={"button"}

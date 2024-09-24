@@ -43,7 +43,7 @@ export const GridActions = memo(() => {
   if (!!typeInInsertion) return null;
 
   return (
-    <div className="flex justify-between items-center">
+    <div className="flex justify-between items-center flex-wrap gap-2">
       <div className="flex gap-2 items-center">
         <Button onClick={handleCreateCompany}>Add company</Button>
         <Button onClick={handleCreateContact}>Add contact</Button>
@@ -61,7 +61,7 @@ export const GridActions = memo(() => {
           type={"search"}
           onChange={onFilterTextBoxChanged}
           placeholder={"Search"}
-          className="max-w-80"
+          className="min-w-40 max-w-80"
         />
       </div>
     </div>
